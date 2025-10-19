@@ -20,7 +20,7 @@ const signInWithWallet = async () => {
 	// ...
   return (
   <div className="w-[360px] max-w-full px-6 py-10 rounded-2xl shadow-2xl bg-gradient-to-b from-gray-900 to-slate-800">
-    <!-- Header -->
+    {/* <!-- Header --> */}
     <div className="text-center mb-8">
       <h1 className="text-3xl font-extrabold tracking-tight text-indigo-400">P2P Services</h1>
       <p className="text-gray-300 mt-2 text-sm">
@@ -29,7 +29,7 @@ const signInWithWallet = async () => {
       </p>
     </div>
 
-    <!-- Icon or Illustration -->
+    {/* <!-- Icon or Illustration --> */}
     <div className="flex justify-center mb-8">
       <div className="w-24 h-24 bg-indigo-500 bg-opacity-20 flex items-center justify-center rounded-full shadow-inner">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,7 +39,7 @@ const signInWithWallet = async () => {
       </div>
     </div>
 
-    <!-- Services Section -->
+    {/* <!-- Services Section --> */}
     <div className="mb-10 text-center space-y-3">
       <div className="bg-gray-800 bg-opacity-50 rounded-xl p-3">
         <p className="font-semibold text-indigo-300">🔁 P2P Crypto Exchange</p>
@@ -51,14 +51,14 @@ const signInWithWallet = async () => {
       </div>
     </div>
 
-    <!-- Connect Button -->
+    {/* <!-- Connect Button --> */}
     <div className="flex justify-center">
       <button onclick={signInWithWallet} className="bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all duration-200 text-white font-semibold px-10 py-3 rounded-full shadow-lg">
         Connect
       </button>
     </div>
 
-    <!-- Footer -->
+    {/* <!-- Footer --> */}
     <div className="text-center mt-8">
       <p className="text-xs text-gray-500">Powered by <span class="text-indigo-400 font-semibold">P2P Services</span></p>
     </div>
