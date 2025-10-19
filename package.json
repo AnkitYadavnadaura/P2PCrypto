@@ -22,6 +22,7 @@
     "@types/node": "^20.6.2",
     "@types/react":"^19.2.2",
     "prisma":"^6.17.1",
-    "@prisma/client":"^6.17.1"
+    "@prisma/client":"^6.17.1",
+    "@worldcoin/minikit-js":"^1.9.8"
   }
 }
