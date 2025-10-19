@@ -1,15 +1,50 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+// app/api/confirm/route.ts
+import { prisma } from '@/lib/prisma';
+import { NextResponse } from 'next/server';
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const { order_id } = body;
-  if (!order_id) return NextResponse.json({ error: 'order_id required' }, { status: 400 });
-  const order = (await pool.query('SELECT * FROM orders WHERE id=$1', [order_id])).rows[0];
-  if (!order) return NextResponse.json({ error: 'not found' }, { status: 404 });
-  // basic check and fake release tx (replace with KMS + signer in prod)
-  await pool.query('UPDATE orders SET status=$1, release_tx=$2, released_at=now(), updated_at=now() WHERE id=$3', ['RELEASED', '0xFAKE_TX_FOR_DEV', order_id]);
-  await pool.query('INSERT INTO transactions(entity_type, entity_id, type, amount_crypto, metadata, created_at) VALUES ($1,$2,$3,$4,$5,now())', ['order', order_id, 'DEBIT', order.amount_crypto, JSON_BUILD_OBJECT('tx', '0xFAKE_TX_FOR_DEV')]);
-  return NextResponse.json({ ok: true, tx: '0xFAKE_TX_FOR_DEV' });
+export async function POST(req: Request) {
+  try {
+    const { order_id } = await req.json();
+
+    if (!order_id) {
+      return NextResponse.json({ error: 'order_id is required' }, { status: 400 });
+    }
+
+    // Fetch the order
+    const order = await prisma.orders.findUnique({
+      where: { id: order_id },
+    });
+
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    // Update order status to RELEASED with fake TX
+    await prisma.orders.update({
+      where: { id: order_id },
+      data: {
+        status: 'RELEASED',
+        release_tx: '0xFAKE_TX_FOR_DEV',
+        released_at: new Date(),
+        updated_at: new Date(),
+      },
+    });
+
+    // Create a transaction record
+    await prisma.transactions.create({
+      data: {
+        entity_type: 'order',
+        entity_id: order_id,
+        type: 'DEBIT',
+        amount_crypto: order.amount_crypto,
+        metadata: { tx: '0xFAKE_TX_FOR_DEV' }, // Prisma handles JSON automatically
+        created_at: new Date(),
+      },
+    });
+
+    return NextResponse.json({ ok: true, tx: '0xFAKE_TX_FOR_DEV' });
+  } catch (err) {
+    console.error('Error in confirm API:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
