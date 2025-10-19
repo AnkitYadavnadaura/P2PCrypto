@@ -17,6 +17,9 @@
     "pusher": "^5.0.0",
     "pusher-js": "^8.2.0",
     "swr": "^2.2.0",
-    "axios": "^1.4.0"
+    "axios": "^1.4.0",
+    "typescript",
+    "@types/react",
+    "@types/node"
   }
 }
