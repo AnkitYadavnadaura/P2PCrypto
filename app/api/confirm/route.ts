@@ -1,5 +1,5 @@
 // app/api/confirm/route.ts
-import { prisma } from '../../../lib/prisma';
+import { prisma } from '../../../lib/prisma'; // use relative path or @ alias if configured
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     }
 
     // Fetch the order
-    const order = await prisma.orders.findUnique({
+    const order = await prisma.order.findUnique({
       where: { id: order_id },
     });
 
@@ -19,25 +19,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    // Update order status to RELEASED with fake TX
-    await prisma.orders.update({
+    // Update order status
+    await prisma.order.update({
       where: { id: order_id },
       data: {
         status: 'RELEASED',
-        release_tx: '0xFAKE_TX_FOR_DEV',
-        released_at: new Date(),
-        updated_at: new Date(),
+        createdAt: new Date(), // optional: update timestamp if needed
       },
     });
 
-    // Create a transaction record
-    await prisma.transactions.create({
+    // Create transaction
+    await prisma.transaction.create({
       data: {
-        entity_type: 'order',
+        entity_type: 'order',           // optional: you can add this field if your table supports it
         entity_id: order_id,
         type: 'DEBIT',
-        amount_crypto: order.amount_crypto,
-        metadata: { tx: '0xFAKE_TX_FOR_DEV' }, // Prisma handles JSON automatically
+        amount_crypto: order.amountCrypto,
+        metadata: { tx: '0xFAKE_TX_FOR_DEV' }, // JSON object
         created_at: new Date(),
       },
     });
