@@ -1,0 +1,35 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  walletAddress String? @unique
+  email        String?
+  kycStatus    String?  @default("PENDING")
+  createdAt    DateTime @default(now())
+}
+
+model Listing {
+  id         String  @id @default(uuid())
+  sellerId   String?
+  title      String?
+  cryptoSymbol String?
+  priceValue Float?
+  createdAt  DateTime @default(now())
+}
+
+model Order {
+  id         String @id @default(uuid())
+  listingId  String?
+  amountCrypto Float?
+  price      Float?
+  fiatAmount Float?
+  status     String?
+  createdAt  DateTime @default(now())
+}
