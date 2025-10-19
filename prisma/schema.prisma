@@ -33,3 +33,13 @@ model Order {
   status     String?
   createdAt  DateTime @default(now())
 }
+
+model Transaction {
+  id           String   @id @default(uuid())
+  entity_type  String
+  entity_id    String
+  type         String
+  amount_crypto Float
+  metadata     Json
+  created_at   DateTime @default(now())
+}
