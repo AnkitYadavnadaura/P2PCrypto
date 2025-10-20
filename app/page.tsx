@@ -5,11 +5,13 @@ import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
 export default function Page(){
   
 const signInWithWallet = async () => {
+	alert("function Called")
   if (!MiniKit.isInstalled()) {
     console.warn("MiniKit not installed");
 	  alert("miniKit not Installed")
     return;
   }
+	alert("hello bro")
 
   try {
     const { commandPayload: generateMessageResult, finalPayload } =
