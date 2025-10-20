@@ -5,20 +5,31 @@ import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
 export default function Page(){
   
 const signInWithWallet = async () => {
-	if (!MiniKit.isInstalled()) {
-		return
-	}
-	// const res = await fetch(`/api/nonce`)
-	// const { nonce } = await res.json()
+  if (!MiniKit.isInstalled()) {
+    console.warn("MiniKit not installed");
+	  alert("miniKit not Installed")
+    return;
+  }
 
-	const {commandPayload: generateMessageResult, finalPayload} = await MiniKit.commandsAsync.walletAuth({
-		nonce: Date.now().toString(),
-		requestId: '0', // Optional
-		expirationTime: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000),
-		notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-		statement: 'This is my statement and here is a link https://worldcoin.com/apps',
-	})
+  try {
+    const { commandPayload: generateMessageResult, finalPayload } =
+      await MiniKit.commandsAsync.walletAuth({
+        nonce: Date.now().toString(), // ✅ must be string
+        requestId: "0", // optional
+        expirationTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days ahead
+        notBefore: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day before
+        statement:
+          "This is my statement and here is a link https://worldcoin.com/apps",
+      });
+
+    console.log("Auth success:", { generateMessageResult, finalPayload });
+	  alert("success")
+  } catch (err) {
+    console.error("Wallet auth failed:", err);
+	  alert(errs)
+  }
 }
+
 	// ...
   return (
   <div className="w-[360px] max-w-full px-6 py-10 rounded-2xl shadow-2xl bg-gradient-to-b from-gray-900 to-slate-800">
