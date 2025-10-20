@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     // const user = await db.user.upsert({ where: { wallet: walletAddress }, create: { wallet: walletAddress } });
     const user = await prisma.user.upsert({
       where: { walletAddress },
-      update: { lastLogin: new Date() },
+      update: { createdAt: new Date() },
       create: {
         walletAddress,
         email: null,
