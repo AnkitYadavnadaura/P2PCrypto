@@ -1,6 +1,6 @@
 import './globals.css';
 import MiniKitProvider from './minikit-provider';
-export const metadata = { title: 'P2P MiniApp' };
+export const metadata = { title: 'P2P Services' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
