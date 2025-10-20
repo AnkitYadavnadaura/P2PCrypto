@@ -1,5 +1,5 @@
 import './globals.css';
-import { MiniKitProvider } from "@worldcoin/minikit-js/minikit-provider";
+import { MiniKitProvider } from "@worldcoin/minikit-react";
 export const metadata = { title: 'P2P MiniApp' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
