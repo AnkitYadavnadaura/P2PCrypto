@@ -4,8 +4,8 @@ import {minikit} from '@worldcoin/minikit-js'
 
 export default function MiniKitProvider({children}:{children: ReactNode}){
 
-useEffect{()=>{
+useEffect(()=>{
   minikit.install()
-},[]}
+},[])
   return <>{children}</>
 }
