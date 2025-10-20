@@ -17,6 +17,7 @@ const signInWithWallet = async () => {
 		notBefore: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
 		statement: 'This is my statement and here is a link https://worldcoin.com/apps',
 	})
+}
 	// ...
   return (
   <div className="w-[360px] max-w-full px-6 py-10 rounded-2xl shadow-2xl bg-gradient-to-b from-gray-900 to-slate-800">
