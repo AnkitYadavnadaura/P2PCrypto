@@ -53,7 +53,7 @@ const signInWithWallet = async () => {
 
     {/* <!-- Connect Button --> */}
     <div className="flex justify-center">
-      <button onclick={signInWithWallet} className="bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all duration-200 text-white font-semibold px-10 py-3 rounded-full shadow-lg">
+      <button onClick={signInWithWallet} className="bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all duration-200 text-white font-semibold px-10 py-3 rounded-full shadow-lg">
         Connect
       </button>
     </div>
