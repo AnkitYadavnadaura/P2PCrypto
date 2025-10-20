@@ -5,13 +5,13 @@ import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
 export default function Page(){
   
 const signInWithWallet = async () => {
-	alert("function Called")
+	// alert("function Called")
   if (!MiniKit.isInstalled()) {
     console.warn("MiniKit not installed");
-	  alert("miniKit not Installed")
+	  // alert("miniKit not Installed")
     return;
   }
-	alert("hello bro")
+	// alert("hello bro")
 
   try {
     const { commandPayload: generateMessageResult, finalPayload } =
@@ -25,16 +25,26 @@ const signInWithWallet = async () => {
       });
 
     console.log("Auth success:", { generateMessageResult, finalPayload });
-	  alert("success")
+	  // alert("success")
+	  // Send to backend for verification
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalPayload),
+      });
+
+      const data = await res.json();
+      if (data.success) alert("Login successful!");
+      else alert("Login failed");
   } catch (err) {
     console.error("Wallet auth failed:", err);
-	  alert(err)
+	  // alert(err)
   }
 }
 
 	// ...
   return (
-  <div className="w-[360px] max-w-full px-6 py-10 rounded-2xl shadow-2xl bg-gradient-to-b from-gray-900 to-slate-800">
+  <div className="min-h-screen w-full flex flex-col items-center justify-center bg-gradient-to-b from-gray-900 to-slate-800 text-white">
     {/* <!-- Header --> */}
     <div className="text-center mb-8">
       <h1 className="text-3xl font-extrabold tracking-tight text-indigo-400">P2P Services</h1>
