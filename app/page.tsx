@@ -61,7 +61,7 @@ const signInWithWallet = async () => {
 
     {/* <!-- Footer --> */}
     <div className="text-center mt-8">
-      <p className="text-xs text-gray-500">Powered by <span class="text-indigo-400 font-semibold">P2P Services</span></p>
+      <p className="text-xs text-gray-500">Powered by <span className="text-indigo-400 font-semibold">P2P Services</span></p>
     </div>
   </div>
   )
