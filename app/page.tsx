@@ -36,6 +36,7 @@ const signInWithWallet = async () => {
       });
 
       const data = await res.json();
+	  alert(JSON.stringify(data))
       if (data.success) alert("Login successful!");
       else alert("Login failed");
   } catch (err) {
