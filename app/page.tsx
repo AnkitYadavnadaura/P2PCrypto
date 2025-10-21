@@ -15,10 +15,10 @@ const signInWithWallet = async () => {
 
   try {
 	  const splMessage = {
-        nonce: Date.now().toString(), // ✅ must be string
+        nonce: Date.now().toString(),
         requestId: "0", // optional
-        expirationTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days ahead
-        notBefore: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day before
+        expirationTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        notBefore: new Date(Date.now() - 24 * 60 * 60 * 1000),
         statement:
           "This is my statement and here is a link https://worldcoin.com/apps",
       }
@@ -33,7 +33,7 @@ const signInWithWallet = async () => {
       const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({finalPayload,message:splMessage}),
+        body: JSON.stringify({finalPayload,message:JSON.stringify(splMessage)}),
       });
 
       const data = await res.json();
