@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     const recovered = ethers.verifyMessage(message, signature);
 
     if (recovered.toLowerCase() !== walletAddress.toLowerCase()) {
-      return NextResponse.json({ success: false, error: "Invalid signature" }, { status: 401 });
+      return NextResponse.json({ success: false, error: "Invalid signature" ,recovered , walletAdress}, { status: 401 });
     }
     // Save or find user in database (pseudo code)
     // const user = await db.user.upsert({ where: { wallet: walletAddress }, create: { wallet: walletAddress } });
