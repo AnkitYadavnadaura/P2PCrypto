@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     // Extract wallet address
     const walletAddress = body.finalPayload.address;
     const signature = body.finalPayload.signature;
-    const message = "This is my statement and here is a link https://worldcoin.com/apps";
+    const message = body.finalPayload.message;
     if (!walletAddress || !signature) {
       return NextResponse.json({ success: false, error: "Missing wallet data" }, { status: 400 });
     }
