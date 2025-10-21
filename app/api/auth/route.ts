@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const walletAddress = body.finalPayload.address;
     // return NextResponse.json({success:true,error:walletAddress})
     const signature = body.finalPayload.signature;
-    const message = body.message;
+    const message = str(body.message);
     // return NextResponse.json({success:true,error:"ethers fucks"})
     
     if (!walletAddress || !signature) {
