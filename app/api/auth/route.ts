@@ -15,10 +15,10 @@ export async function POST(req: Request) {
 
     // Extract wallet address
     const walletAddress = body.address;
-    return NextResponse.json({success:true,error:walletAddress})
-    const signature = body.finalPayload.signature;
-    const message = body.finalPayload.message;
-    return NextResponse.json({success:true,error:"ethers fucks"})
+    // return NextResponse.json({success:true,error:walletAddress})
+    const signature = body.signature;
+    const message = body.message;
+    // return NextResponse.json({success:true,error:"ethers fucks"})
     
     if (!walletAddress || !signature) {
       return NextResponse.json({ success: false, error: "Missing wallet data" }, { status: 400 });
@@ -30,7 +30,6 @@ export async function POST(req: Request) {
     }
     // Save or find user in database (pseudo code)
     // const user = await db.user.upsert({ where: { wallet: walletAddress }, create: { wallet: walletAddress } });
-    return NextResponse.json({success:true,error:"Database fucks"})
     const user = await prisma.user.upsert({
       where: { walletAddress },
       update: { createdAt: new Date() },
