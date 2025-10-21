@@ -5,7 +5,6 @@ import { ethers } from "ethers";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    return NextResponse.json({success:true,error:"something fucks"})
 
     // Verify the payload from MiniKit
     // const isValid = await verifyWalletAuth(body.finalPayload);
@@ -16,6 +15,7 @@ export async function POST(req: Request) {
 
     // Extract wallet address
     const walletAddress = body.finalPayload.address;
+    return NextResponse.json({success:true,error:walletAddress})
     const signature = body.finalPayload.signature;
     const message = body.finalPayload.message;
     return NextResponse.json({success:true,error:"ethers fucks"})
