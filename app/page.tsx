@@ -26,7 +26,7 @@ const signInWithWallet = async () => {
 
     console.log("Auth success:", { generateMessageResult, finalPayload });
 	  alert(JSON.stringify(finalPayload))
-	  alert(generateMessageResult)
+	  alert(JSON.stringify(generateMessageResult))
 	  // alert("success")
 	  // Send to backend for verification
       const res = await fetch("/api/auth", {
