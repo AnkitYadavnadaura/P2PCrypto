@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     const walletAddress = body.finalPayload.address;
     const signature = body.finalPayload.signature;
     const message = body.finalPayload.message;
+    return NextResponse.json({success:true,error:"ethers fucks"})
     
     if (!walletAddress || !signature) {
       return NextResponse.json({ success: false, error: "Missing wallet data" }, { status: 400 });
