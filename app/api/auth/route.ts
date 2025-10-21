@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     const walletAddress = body.finalPayload.address;
     const signature = body.finalPayload.signature;
     const message = body.finalPayload.message;
+    
     if (!walletAddress || !signature) {
       return NextResponse.json({ success: false, error: "Missing wallet data" }, { status: 400 });
     }
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
     }
     // Save or find user in database (pseudo code)
     // const user = await db.user.upsert({ where: { wallet: walletAddress }, create: { wallet: walletAddress } });
+    return NextResponse.json({success:true,error:"Database fucks"})
     const user = await prisma.user.upsert({
       where: { walletAddress },
       update: { createdAt: new Date() },
