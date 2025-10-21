@@ -14,9 +14,9 @@ export async function POST(req: Request) {
     // }
 
     // Extract wallet address
-    const walletAddress = body.address;
+    const walletAddress = body.finalPayload.address;
     // return NextResponse.json({success:true,error:walletAddress})
-    const signature = body.signature;
+    const signature = body.finalPayload.signature;
     const message = body.message;
     // return NextResponse.json({success:true,error:"ethers fucks"})
     
