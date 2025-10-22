@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
-import { ethers } from "ethers";
+import { SiweMessage } from "siwe";
 
 export async function POST(req: Request) {
   try {
@@ -17,15 +17,15 @@ export async function POST(req: Request) {
     const walletAddress = body.finalPayload.address;
     // return NextResponse.json({success:true,error:walletAddress})
     const signature = body.finalPayload.signature;
-    const message = body.finalPayload.message.replace(/\\n/g, "\n");
+     const message = new SiweMessage(body.message);
     // return NextResponse.json({success:true,error:"ethers fucks"})
     
     if (!walletAddress || !signature) {
       return NextResponse.json({ success: false, error: "Missing wallet data" }, { status: 400 });
     }
-    const recovered = ethers.verifyMessage(message, signature);
+    const fields = await message.validate(finalPayload.signature);
 
-    if (recovered.toLowerCase() !== walletAddress.toLowerCase()) {
+    if (fields.address.toLowerCase() !== walletAddress.toLowerCase()) {
       return NextResponse.json({ success: false, error: "Invalid signature" ,recovered , walletAddress}, { status: 401 });
     }
     // Save or find user in database (pseudo code)
