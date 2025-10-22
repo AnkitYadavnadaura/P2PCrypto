@@ -23,9 +23,11 @@ export async function POST(req: Request) {
     if (!walletAddress || !signature) {
       return NextResponse.json({ success: false, error: "Missing wallet data" }, { status: 400 });
     }
-    const fields = await message.validate(finalPayload.signature);
+    const result = await message.verify({
+      signature: body.finalPayload.signature,
+    });
 
-    if (fields.address.toLowerCase() !== walletAddress.toLowerCase()) {
+    if (result.address.toLowerCase() !== walletAddress.toLowerCase()) {
       return NextResponse.json({ success: false, error: "Invalid signature" ,recovered , walletAddress}, { status: 401 });
     }
     // Save or find user in database (pseudo code)
