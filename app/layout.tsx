@@ -12,7 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <MiniKitProvider>
       <body>
-        <main style={{padding:16}}>{children}</main>
+        <main>{children}</main>
       </body>
       </MiniKitProvider>
     </html>
