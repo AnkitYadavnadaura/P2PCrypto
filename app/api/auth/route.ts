@@ -26,10 +26,11 @@ export async function POST(req: Request) {
     const result = await message.verify({
       signature: body.finalPayload.signature,
     });
+    return NextResponse.json(result)
 
-    if (result.address.toLowerCase() !== walletAddress.toLowerCase()) {
-      return NextResponse.json({ success: false, error: "Invalid signature" ,recovered , walletAddress}, { status: 401 });
-    }
+    // if (result.address.toLowerCase() !== walletAddress.toLowerCase()) {
+    //   return NextResponse.json({ success: false, error: "Invalid signature" ,recovered , walletAddress}, { status: 401 });
+    // }
     // Save or find user in database (pseudo code)
     // const user = await db.user.upsert({ where: { wallet: walletAddress }, create: { wallet: walletAddress } });
     const user = await prisma.user.upsert({
