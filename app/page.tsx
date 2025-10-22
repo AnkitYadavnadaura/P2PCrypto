@@ -12,10 +12,11 @@ const signInWithWallet = async () => {
     return;
   }
 	// alert("hello bro")
+	const nonce = Date.now().toString()
 
   try {
 	  const splMessage = {
-        nonce: Date.now().toString(),
+        nonce: nonce,
         requestId: "0", // optional
         expirationTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         notBefore: new Date(Date.now() - 24 * 60 * 60 * 1000),
@@ -33,8 +34,11 @@ const signInWithWallet = async () => {
       const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({finalPayload,message:generateMessageResult.siweMessage}),
-      });
+        body: JSON.stringify({
+				payload: finalPayload,
+				nonce,
+			}),
+	  });
 
       const data = await res.json();
 	  alert(JSON.stringify(data))
