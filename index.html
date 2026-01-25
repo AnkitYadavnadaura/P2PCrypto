@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>World Chain Contract Deployer</title>
+
+  <!-- Ethers v5 (most stable for wallets) -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+    }
+    button {
+      padding: 10px 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Deploy Contract to World Chain</h2>
+
+<label>Contract ABI (JSON)</label>
+<textarea id="abi"></textarea>
+
+<label>Contract Bytecode (0x...)</label>
+<textarea id="bytecode"></textarea>
+
+<button onclick="deploy()">Deploy Contract</button>
+
+<div id="status"></div>
+
+<script>
+async function deploy() {
+  const status = document.getElementById("status");
+
+  if (!window.ethereum) {
+    status.innerText = "World App wallet not detected";
+    return;
+  }
+
+  try {
+    // Request wallet connection
+    await window.ethereum.request({ method: "eth_requestAccounts" });
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    // Optional safety check: chainId
+    const network = await provider.getNetwork();
+    if (network.chainId !== 480) {
+      status.innerText = "Please switch to World Chain";
+      return;
+    }
+
+    const abi = JSON.parse(document.getElementById("abi").value);
+    const bytecode = document.getElementById("bytecode").value.trim();
+
+    if (!bytecode.startsWith("0x")) {
+      status.innerText = "Invalid bytecode";
+      return;
+    }
+
+    status.innerText = "Deploying...";
+
+    const factory = new ethers.ContractFactory(abi, bytecode, signer);
+    const contract = await factory.deploy(); // constructor args go here
+
+    status.innerText = "Waiting for confirmation...";
+    await contract.deployed();
+
+    status.innerText = "Deployed at: " + contract.address;
+
+  } catch (err) {
+    console.error(err);
+    status.innerText = "Error: " + (err.message || err);
+  }
+}
+</script>
+
+</body>
+</html>
