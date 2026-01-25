@@ -1,11 +1,13 @@
 "use client";
 import Link from 'next/link';
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
+import { useRouter } from "next/navigation";
 // ...
 export default function Page(){
   
 const signInWithWallet = async () => {
 	// alert("function Called")
+	const router = useRouter();
   if (!MiniKit.isInstalled()) {
     console.warn("MiniKit not installed");
 	  // alert("miniKit not Installed")
@@ -27,8 +29,8 @@ const signInWithWallet = async () => {
       await MiniKit.commandsAsync.walletAuth(splMessage);
 
     console.log("Auth success:", { generateMessageResult, finalPayload });
-	  alert(JSON.stringify(finalPayload))
-	  alert(JSON.stringify(generateMessageResult))
+	  // alert(JSON.stringify(finalPayload))
+	  // alert(JSON.stringify(generateMessageResult))
 	  // alert("success")
 	  // Send to backend for verification
       const res = await fetch("/api/auth", {
@@ -41,8 +43,11 @@ const signInWithWallet = async () => {
 	  });
 
       const data = await res.json();
-	  alert(JSON.stringify(data))
-      if (data.success) alert("Login successful!");
+	  // alert(JSON.stringify(data))
+      if (data.success){
+		  //alert("Login successful!");
+		  router.push("/dashboard");
+	  }
       else alert("Login failed");
   } catch (err) {
     console.error("Wallet auth failed:", err);
