@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
 import { ethers } from "ethers";
+import { cookies } from "next/headers";
 import {
   MiniAppWalletAuthSuccessPayload,
   verifySiweMessage,
@@ -28,12 +29,17 @@ export async function POST(req: Request) {
         kycStatus: "PENDING",
       },
     });
+     cookies().set("wallet", payload.address, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+  });
 
-    return NextResponse.json({
-      success: true,
-      wallet: walletAddress,
-      user
-    });
+    return Response.json({
+    success: true,
+    redirect: "/dashboard",
+  });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ success: false, error: err }, { status: 500 });
