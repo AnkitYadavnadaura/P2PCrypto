@@ -29,7 +29,8 @@ export async function POST(req: Request) {
         kycStatus: "PENDING",
       },
     });
-     cookies().set("wallet", payload.address, {
+    const cookieStore = await cookies();
+     cookieStore.set("wallet", payload.address, {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
