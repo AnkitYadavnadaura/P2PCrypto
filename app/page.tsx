@@ -46,7 +46,9 @@ const signInWithWallet = async () => {
 	  // alert(JSON.stringify(data))
       if (data.success){
 		  //alert("Login successful!");
-		  router.push("/dashboard");
+		  if (data.success && data.redirect) {
+  			window.location.href = data.redirect;
+		}
 	  }
       else alert("Login failed");
   } catch (err) {
