@@ -1,7 +1,6 @@
 "use client";
 import Link from 'next/link';
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
-import { useRouter } from "next/navigation";
 // ...
 export default function Page(){
   
