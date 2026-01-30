@@ -53,7 +53,7 @@ const signInWithWallet = async () => {
       else alert("Login failed");
   } catch (err) {
     console.error("Wallet auth failed:", err);
-	  // alert(err)
+	   alert(err)
   }
 }
 
