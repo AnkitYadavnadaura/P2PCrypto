@@ -22,19 +22,18 @@ export default function Dashboard() {
   const handleDeploy = async () => {
   try {
     const txInput: any = {
-  transaction: [{
+  transaction: {
     to: null,
     data:bytecode,      // contract bytecode + constructor args
     value: "0x0",
   },
-  ],
 };
 
 const result = await MiniKit.commandsAsync.sendTransaction(txInput);
-    alert(result)
+    //alert(result)
 
     const hash = result.finalPayload;
-    alert(hash)
+    //alert(hash)
     if (!hash) {
       throw new Error("Transaction hash not returned");
     }
