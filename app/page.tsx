@@ -6,7 +6,6 @@ export default function Page(){
   
 const signInWithWallet = async () => {
 	// alert("function Called")
-	const router = useRouter();
   if (!MiniKit.isInstalled()) {
     console.warn("MiniKit not installed");
 	  // alert("miniKit not Installed")
