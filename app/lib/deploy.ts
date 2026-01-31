@@ -1,7 +1,8 @@
 "use client";
 
 import { MiniKit } from "@worldcoin/minikit-js";
-import { Interface, keccak256, RLP } from "ethers";
+import { Interface, keccak256 } from "ethers";
+import { encodeRlp } from "ethers/utils";
 
 export async function deployContract(
   abi: any,
@@ -12,34 +13,34 @@ export async function deployContract(
     throw new Error("MiniKit not installed");
   }
 
-  // 1. Encode constructor args
+  // 1. Encode constructor arguments
   const iface = new Interface(abi);
   const encodedArgs = iface.encodeDeploy(args);
 
-  // 2. Full deploy calldata
+  // 2. Full deployment calldata
   const data = bytecode + encodedArgs.slice(2);
 
-  // 3. Send RAW transaction (contract creation)
+  // 3. Send raw contract-creation transaction
   const result = await MiniKit.commandsAsync.sendTransaction({
     transactions: [
       {
-        data,                 // REQUIRED
-        value: "0x0",         // REQUIRED (hex)
+        data,
+        value: "0x0",
       },
     ],
   });
 
-  if (!result || !result.transactions?.[0]) {
+  if (!result?.transactions?.[0]) {
     throw new Error("Transaction failed");
   }
 
   const tx = result.transactions[0];
 
-  // 4. Compute deployed contract address (EVM standard)
+  // 4. Compute deployed contract address (EVM rule)
   const contractAddress =
     "0x" +
     keccak256(
-      RLP.encode([tx.from, tx.nonce])
+      encodeRlp([tx.from, tx.nonce])
     ).slice(26);
 
   return contractAddress;
