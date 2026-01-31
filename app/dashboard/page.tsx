@@ -23,6 +23,7 @@ export default function Dashboard() {
   try {
     const txInput: any = {
   transaction: [{
+    to: null,
     data:bytecode,      // contract bytecode + constructor args
     value: "0x0",
   },
