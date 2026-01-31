@@ -30,7 +30,7 @@ export default function Dashboard() {
 
 const result = await MiniKit.commandsAsync.sendTransaction(txInput);
 
-    const hash = result.finalPayload.transactionHash;
+    const hash = result.finalPayload;
 
     if (!hash) {
       throw new Error("Transaction hash not returned");
