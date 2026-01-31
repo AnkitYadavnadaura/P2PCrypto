@@ -35,8 +35,9 @@ const result = await MiniKit.commandsAsync.sendTransaction(txInput);
     if (!hash) {
       throw new Error("Transaction hash not returned");
     }
+    
 
-    setTxHash(hash);
+    //setTxHash(hash);
   } catch (err: any) {
     console.error(err);
     alert(err.message || "Deployment failed");
