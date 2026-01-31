@@ -28,17 +28,22 @@ export async function POST(req: Request) {
       },
     });
 
-    // Create transaction
-    await prisma.transaction.create({
-      data: {
-        entity_type: 'order',           // optional: you can add this field if your table supports it
-        entity_id: order_id,
-        type: 'DEBIT',
-        amount_crypto: order.amountCrypto,
-        metadata: { tx: '0xFAKE_TX_FOR_DEV' }, // JSON object
-        created_at: new Date(),
-      },
-    });
+    if (order.amountCrypto === null) {
+  return NextResponse.json(
+    { error: "Invalid order: amountCrypto is null" },
+    { status: 400 }
+  );
+}
+
+await prisma.transaction.create({
+  data: {
+    entity_id: order_id,
+    type: "DEBIT",
+    amount_crypto: order.amountCrypto,
+    metadata: { tx: "0xFAKE_TX_FOR_DEV" },
+    created_at: new Date(),
+  },
+});
 
     return NextResponse.json({ ok: true, tx: '0xFAKE_TX_FOR_DEV' });
   } catch (err) {
