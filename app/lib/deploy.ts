@@ -15,14 +15,15 @@ export async function deployContract(
     bytecode,
     encodedArgs,
   ]);
-
-  // 3. Send contract creation tx (NO `to`)
-  const result = await MiniKit.commandsAsync.sendTransaction({
+  const txInput: any = {
     transaction: {
       data,
       value: "0x0",
     },
-  });
+  }
+
+  // 3. Send contract creation tx (NO `to`)
+  const result = await MiniKit.commandsAsync.sendTransaction(txInput);
 
   return result;
 }
