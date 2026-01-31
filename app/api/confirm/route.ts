@@ -38,12 +38,14 @@ export async function POST(req: Request) {
 await prisma.transaction.create({
   data: {
     entity_id: order_id,
+    entity_type: "ORDER", // ✅ REQUIRED
     type: "DEBIT",
     amount_crypto: order.amountCrypto,
     metadata: { tx: "0xFAKE_TX_FOR_DEV" },
     created_at: new Date(),
   },
 });
+
 
     return NextResponse.json({ ok: true, tx: '0xFAKE_TX_FOR_DEV' });
   } catch (err) {
