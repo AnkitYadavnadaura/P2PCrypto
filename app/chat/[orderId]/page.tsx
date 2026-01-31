@@ -10,7 +10,17 @@ export default function ChatPage(){
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState('');
   useEffect(()=> {
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, { cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER });
+    const PUSHER_KEY = process.env.NEXT_PUBLIC_PUSHER_KEY;
+const PUSHER_CLUSTER = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+
+if (!PUSHER_KEY || !PUSHER_CLUSTER) {
+  throw new Error("Pusher env vars are missing");
+}
+
+const pusher = new Pusher(PUSHER_KEY, {
+  cluster: PUSHER_CLUSTER,
+});
+
     const channel = pusher.subscribe('order-' + orderId);
     channel.bind('message:new', (data:any)=>{
       setMessages(prev=>[...prev, data]);
