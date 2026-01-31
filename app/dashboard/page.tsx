@@ -21,7 +21,7 @@ export default function Dashboard() {
 
   const handleDeploy = async () => {
   try {
-    const txInput: SendTransactionInput = {
+    const txInput: any = {
   transaction: {
     data,      // contract bytecode + constructor args
     value: "0x0",
