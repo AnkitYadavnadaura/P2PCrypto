@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { deployContract } from "../lib/deploy";
-
+import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
 export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [address, setAddress] = useState<string | null>(null);
