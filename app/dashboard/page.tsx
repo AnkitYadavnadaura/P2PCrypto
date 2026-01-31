@@ -22,10 +22,11 @@ export default function Dashboard() {
   const handleDeploy = async () => {
   try {
     const result = await MiniKit.commandsAsync.sendTransaction({
-      transaction: {
+      transaction: [{
         data,
         value: "0x0",
       },
+      ],
     });
 
     const hash = result.finalPayload.transactionHash;
