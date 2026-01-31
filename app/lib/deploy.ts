@@ -1,7 +1,7 @@
 "use client";
 
 import { MiniKit } from "@worldcoin/minikit-js";
-import { BrowserProvider, ContractFactory } from "ethers";
+import { Interface } from "ethers";
 
 export async function deployContract(
   abi: any,
@@ -9,22 +9,41 @@ export async function deployContract(
   args: any[] = []
 ): Promise<string> {
   if (!MiniKit.isInstalled()) {
-    throw new Error("World MiniKit not installed");
+    throw new Error("MiniKit not installed");
   }
 
-  const session = await MiniKit.getWalletSession();
-  if (!session?.provider) {
-    throw new Error("Wallet provider not found");
+  // 1. Encode constructor args
+  const iface = new Interface(abi);
+  const deployData = iface.encodeDeploy(args);
+
+  // 2. Full deployment calldata
+  const data = bytecode + deployData.slice(2);
+
+  // 3. Send raw transaction (NO `to` address)
+  const tx = await MiniKit.commandsAsync.sendTransaction({
+    transaction: {
+      to: undefined, // REQUIRED for contract creation
+      data,
+      value: "0x0",
+    },
+  });
+
+  if (!tx?.transactionHash) {
+    throw new Error("Transaction failed");
   }
 
-  const provider = new BrowserProvider(session.provider);
-  const signer = await provider.getSigner();
+  // 4. Compute contract address (EVM rule)
+  // World App returns from address
+  const from = tx.from;
+  const nonce = tx.nonce;
 
-  const factory = new ContractFactory(abi, bytecode, signer);
-  const contract = await factory.deploy(...args);
+  const deployedAddress = computeContractAddress(from, nonce);
 
-  await contract.waitForDeployment();
+  return deployedAddress;
+}
 
-  // ✅ FORCE STRING (ethers v6 safe)
-  return contract.target.toString();
+// Helper (EVM standard)
+function computeContractAddress(from: string, nonce: number): string {
+  const { keccak256, RLP } = require("ethers");
+  return "0x" + keccak256(RLP.encode([from, nonce])).slice(26);
 }
