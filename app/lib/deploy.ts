@@ -1,8 +1,7 @@
 "use client";
 
 import { MiniKit } from "@worldcoin/minikit-js";
-import { Interface, keccak256 } from "ethers";
-import { encodeRlp } from "ethers/utils";
+import { Interface, keccak256, encodeRlp } from "ethers";
 
 export async function deployContract(
   abi: any,
@@ -36,7 +35,7 @@ export async function deployContract(
 
   const tx = result.transactions[0];
 
-  // 4. Compute deployed contract address (EVM rule)
+  // 4. Compute deployed contract address (EVM standard)
   const contractAddress =
     "0x" +
     keccak256(
