@@ -1,7 +1,7 @@
 "use client";
 
 import { MiniKit } from "@worldcoin/minikit-js";
-import { Interface } from "ethers";
+import { Interface, keccak256, RLP } from "ethers";
 
 export async function deployContract(
   abi: any,
@@ -14,36 +14,33 @@ export async function deployContract(
 
   // 1. Encode constructor args
   const iface = new Interface(abi);
-  const deployData = iface.encodeDeploy(args);
+  const encodedArgs = iface.encodeDeploy(args);
 
-  // 2. Full deployment calldata
-  const data = bytecode + deployData.slice(2);
+  // 2. Full deploy calldata
+  const data = bytecode + encodedArgs.slice(2);
 
-  // 3. Send raw transaction (NO `to` address)
-  const tx = await MiniKit.commandsAsync.sendTransaction({
-    transaction: {
-      to: undefined, // REQUIRED for contract creation
-      data,
-      value: "0x0",
-    },
+  // 3. Send RAW transaction (contract creation)
+  const result = await MiniKit.commandsAsync.sendTransaction({
+    transactions: [
+      {
+        data,                 // REQUIRED
+        value: "0x0",         // REQUIRED (hex)
+      },
+    ],
   });
 
-  if (!tx?.transactionHash) {
+  if (!result || !result.transactions?.[0]) {
     throw new Error("Transaction failed");
   }
 
-  // 4. Compute contract address (EVM rule)
-  // World App returns from address
-  const from = tx.from;
-  const nonce = tx.nonce;
+  const tx = result.transactions[0];
 
-  const deployedAddress = computeContractAddress(from, nonce);
+  // 4. Compute deployed contract address (EVM standard)
+  const contractAddress =
+    "0x" +
+    keccak256(
+      RLP.encode([tx.from, tx.nonce])
+    ).slice(26);
 
-  return deployedAddress;
-}
-
-// Helper (EVM standard)
-function computeContractAddress(from: string, nonce: number): string {
-  const { keccak256, RLP } = require("ethers");
-  return "0x" + keccak256(RLP.encode([from, nonce])).slice(26);
+  return contractAddress;
 }
