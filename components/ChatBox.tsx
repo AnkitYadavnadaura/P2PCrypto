@@ -7,7 +7,15 @@ export default function ChatBox({ orderId }: { orderId: string }){
   const [messages, setMessages] = useState<any[]>([]);
   const [text, setText] = useState('');
   useEffect(()=> {
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, { cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER });
+    const key = process.env.NEXT_PUBLIC_PUSHER_KEY;
+    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER;
+
+    if (!key || !cluster) {
+      console.error("Missing Pusher environment variables");
+      return; // stop if env is missing
+    }
+
+    const pusher = new Pusher(key, { cluster });
     const ch = pusher.subscribe('order-' + orderId);
     ch.bind('message:new', (d:any)=> setMessages(prev=>[...prev,d]));
     return ()=> pusher.disconnect();
