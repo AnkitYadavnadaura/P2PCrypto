@@ -28,7 +28,7 @@ export default function Dashboard() {
   },
 };
 
-const result = await MiniKit.commandsAsync.sendTransaction(txInput);
+const result = await MiniKit.commandsAsync.sendTransaction([txInput]);
 
     const hash = result.finalPayload;
 
