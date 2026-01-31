@@ -22,11 +22,12 @@ export default function Dashboard() {
   const handleDeploy = async () => {
   try {
     const txInput: any = {
-  transaction: {
+  transactions: [{
     to: null,
     data:bytecode,      // contract bytecode + constructor args
     value: "0x0",
   },
+  ],
 };
 
 const result = await MiniKit.commandsAsync.sendTransaction(txInput);
