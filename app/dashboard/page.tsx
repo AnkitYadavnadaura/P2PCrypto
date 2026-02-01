@@ -570,15 +570,26 @@ const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
         </select>
 
         {type === "UPI" && (
-          <UPIForm onSave={onSave} method={editingMethod ?? undefined} />
-        )}
+  <UPIForm
+    onSave={onSave}
+    method={
+      editingMethod?.type === "UPI"
+        ? editingMethod
+        : undefined
+    }
+  />
+)}
 
         {type === "BANK" && (
-          <BankForm onSave={onSave} method={editingMethod ?? undefined} />
+          <BankForm onSave={onSave} method={
+          editingMethod?.type === "BankMethod"
+          ? editingMethod : undefined} />
         )}
 
         {type === "BINANCE" && (
-          <BinanceForm onSave={onSave} method={editingMethod ?? undefined} />
+          <BinanceForm onSave={onSave} method={
+          editingMethod?.type === "BankMethod"
+          ? editingMethod : undefined} />
         )}
 
         <button onClick={onClose} className="mt-4 text-sm text-gray-400">
