@@ -464,7 +464,7 @@ interface AddMethodProps {
 
 interface BankFormProps {
   onSave: (method: PaymentMethod) => void;
-  method?: bankMethod;
+  method?: BankMethod;
 }
 
 const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
@@ -594,7 +594,7 @@ const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
 
 interface UPIFormProps {
   onSave: (method: PaymentMethod) => void;
-  method?: PaymentMethod;
+  method?: UPIMethod;
 }
 
 const UPIForm: React.FC<UPIFormProps> = ({ onSave, method }) => {
