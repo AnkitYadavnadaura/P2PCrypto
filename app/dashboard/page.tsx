@@ -282,3 +282,29 @@ const NavBtn: React.FC<NavBtnProps> = ({
     <span>{label}</span>
   </button>
 );
+
+type ComingSoonCardProps = {
+  title: string;
+  icon: string;
+};
+
+const ComingSoonCard: React.FC<ComingSoonCardProps> = ({ title, icon }) => {
+  return (
+    <div className="relative rounded-xl p-4 h-24 flex flex-col items-center justify-center
+      bg-white/10 backdrop-blur-lg border border-white/20
+      text-gray-300 cursor-not-allowed overflow-hidden">
+
+      {/* Blur overlay */}
+      <div className="absolute inset-0 bg-black/30" />
+
+      <div className="relative z-10 text-center">
+        <div className="text-xl mb-1">{icon}</div>
+        <div className="text-sm font-semibold">{title}</div>
+        <div className="text-xs text-yellow-400 mt-1">
+          Coming Soon ✨
+        </div>
+      </div>
+    </div>
+  );
+};
+
