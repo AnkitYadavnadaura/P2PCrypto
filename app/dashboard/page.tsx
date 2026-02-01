@@ -468,7 +468,7 @@ interface BankFormProps {
 }
 
 const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
-  const [accountName, setAccountName] = useState(method?.accountName || "");
+  const [accountName, setAccountName] = useState(method?.holderName || "");
   const [accountNumber, setAccountNumber] = useState(method?.accountNumber || "");
   const [ifsc, setIfsc] = useState(method?.ifsc || "");
   const [bankName, setBankName] = useState(method?.bankName || "");
@@ -478,7 +478,7 @@ const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
       ...(method ?? {}),
       id: method?.id ?? crypto.randomUUID(),
       type: "BANK",
-      accountName,
+      holderName,
       accountNumber,
       ifsc,
       bankName,
