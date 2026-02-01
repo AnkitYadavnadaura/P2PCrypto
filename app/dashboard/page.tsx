@@ -488,7 +488,7 @@ const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
 
   return (
     <div className="space-y-3">
-      <input placeholder="Account Holder Name" value={accountName}
+      <input placeholder="Account Holder Name" value={holderName}
         onChange={(e) => setAccountName(e.target.value)} className="input" />
 
       <input placeholder="Account Number" value={accountNumber}
