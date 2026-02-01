@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
 import { PaymentMethod , PaymentMethodType } from "../types/payment";
 export default function Dashboard() {
