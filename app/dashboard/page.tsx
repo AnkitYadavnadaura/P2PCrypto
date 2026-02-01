@@ -336,7 +336,6 @@ interface StatProps {
   label: string;
   value: number | string;
 }
-const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
 const StatCard: React.FC<StatProps> = ({ label, value }) => (
   <div className="bg-gray-800 rounded-xl p-4 text-center">
     <p className="text-xs text-gray-400">{label}</p>
