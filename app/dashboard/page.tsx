@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
-import { PaymentMethod } from "../types/payment";
+import { PaymentMethod , PaymentMethodType } from "../types/payment";
 export default function Dashboard() {
   const [section, setSection] = useState("home");
   const [marketTab, setMarketTab] = useState("buy");
