@@ -6,6 +6,10 @@ import { PaymentMethod , PaymentMethodType } from "../types/payment";
 export default function Dashboard() {
   const [section, setSection] = useState("home");
   const [marketTab, setMarketTab] = useState("buy");
+  const [showAddMethod, setShowAddMethod] = useState(false);
+const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
+const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+
 
   return (
     <div className="bg-gray-950 text-white min-h-screen">
