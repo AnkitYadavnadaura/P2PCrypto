@@ -135,9 +135,20 @@ export default function Dashboard() {
 }
 
 /* ---------------- Components ---------------- */
+type ActionButtonProps = {
+  emoji: string;
+  label: string;
+  color: "yellow" | "blue" | "green" | "purple";
+  onClick: () => void;
+};
 
-const ActionButton = ({ emoji, label, onClick, color }) => {
-  const colorMap = {
+const ActionButton: React.FC<ActionButtonProps> = ({
+  emoji,
+  label,
+  onClick,
+  color,
+}) => {
+  const colorMap: Record<ActionButtonProps["color"], string> = {
     yellow: "from-yellow-400 to-yellow-600",
     blue: "from-blue-400 to-blue-600",
     green: "from-green-400 to-green-600",
@@ -155,6 +166,7 @@ const ActionButton = ({ emoji, label, onClick, color }) => {
     </button>
   );
 };
+
 
 
 const TabButton = ({ active, children, onClick }) => (
