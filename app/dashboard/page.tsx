@@ -162,6 +162,13 @@ const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
         <NavBtn icon="👤" label="Profile" onClick={() => setSection("profile")} />
       </nav>
     </div>
+    {showAddMethod && (
+  <AddPaymentMethodModal
+    onClose={() => setShowAddMethod(false)}
+    onSave={handleSaveMethod}
+  />
+)}
+
   );
 }
 
