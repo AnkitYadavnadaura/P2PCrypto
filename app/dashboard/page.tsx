@@ -168,37 +168,88 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 };
 
 
+type TabButtonProps = {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+};
 
-const TabButton = ({ active, children, onClick }) => (
+
+const TabButton: React.FC<TabButtonProps> = ({
+  active,
+  children,
+  onClick,
+}) => (
   <button
     onClick={onClick}
     className={`w-1/2 py-3 font-semibold ${
-      active ? "bg-yellow-500 text-black" : "text-gray-300"
+      active ? "bg-yellow-500 text-black" : "text-gray-300 hover:text-yellow-400"
     }`}
   >
     {children}
   </button>
 );
 
-const MarketList = ({ users, type, color }) => (
-  <div className="flex-1 overflow-y-auto p-3 space-y-3">
-    {users.map((u, i) => (
-      <div key={i} className="bg-gray-800 p-4 rounded-xl flex justify-between">
-        <div>
-          <h3 className="font-semibold text-sm">{u.name}</h3>
-          <p className="text-xs text-gray-400">
-            Price: {u.price} | Limit: {u.limit}
-          </p>
-        </div>
-        <button className={`bg-${color}-400 text-black px-4 py-1 rounded-lg`}>
-          {type}
-        </button>
-      </div>
-    ))}
-  </div>
-);
 
-const Order = ({ id, status, type, amount }) => (
+type MarketUser = {
+  name: string;
+  price: string;
+  limit: string;
+};
+
+type MarketListProps = {
+  users: MarketUser[];
+  type: "Buy" | "Sell";
+  color: "yellow" | "green";
+};
+const MarketList: React.FC<MarketListProps> = ({
+  users,
+  type,
+  color,
+}) => {
+  const buttonColorMap: Record<MarketListProps["color"], string> = {
+    yellow: "bg-yellow-400",
+    green: "bg-green-400",
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto p-3 space-y-3">
+      {users.map((u, i) => (
+        <div
+          key={i}
+          className="bg-gray-800 p-4 rounded-xl flex justify-between items-center"
+        >
+          <div>
+            <h3 className="font-semibold text-sm">{u.name}</h3>
+            <p className="text-xs text-gray-400">
+              Price: {u.price} | Limit: {u.limit}
+            </p>
+          </div>
+
+          <button
+            className={`${buttonColorMap[color]} text-black px-4 py-1 rounded-lg font-bold`}
+          >
+            {type}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+
+type OrderProps = {
+  id: string | number;
+  status: "Completed" | "Pending" | "Cancelled";
+  type: "Buy" | "Sell";
+  amount: string;
+};
+const Order: React.FC<OrderProps> = ({
+  id,
+  status,
+  type,
+  amount,
+}) => (
   <div className="bg-gray-800 p-3 rounded-xl">
     <h3>Order #{id}</h3>
     <p className="text-sm text-gray-400">
@@ -207,7 +258,17 @@ const Order = ({ id, status, type, amount }) => (
   </div>
 );
 
-const NavBtn = ({ icon, label, onClick }) => (
+type NavBtnProps = {
+  icon: string;
+  label: string;
+  onClick: () => void;
+};
+
+const NavBtn: React.FC<NavBtnProps> = ({
+  icon,
+  label,
+  onClick,
+}) => (
   <button onClick={onClick} className="flex flex-col items-center">
     <span>{icon}</span>
     <span>{label}</span>
