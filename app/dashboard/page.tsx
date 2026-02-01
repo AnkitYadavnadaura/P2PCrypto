@@ -151,6 +151,30 @@ const handleSaveMethod = (method: PaymentMethod) => {
   <StatCard label="Payment Methods" value={3} />
   <StatCard label="Cancelled Trades" value={2} />
 </div>
+            <div className="space-y-3 mt-3">
+  {paymentMethods.length === 0 && (
+    <p className="text-xs text-gray-400 text-center">
+      No payment methods added yet
+    </p>
+  )}
+
+  {paymentMethods.map((method) => (
+    <PaymentMethodCard
+      key={method.id}
+      method={method}
+      onEdit={(id) => {
+        const m = paymentMethods.find((x) => x.id === id);
+        if (!m) return;
+        setEditingMethod(m);
+        setShowAddMethod(true);
+      }}
+      onRemove={(id) =>
+        setPaymentMethods((prev) => prev.filter((m) => m.id !== id))
+      }
+    />
+  ))}
+</div>
+
 
             <button className="w-full bg-yellow-500 text-black py-3 rounded-lg font-bold">
               + List New Ad
