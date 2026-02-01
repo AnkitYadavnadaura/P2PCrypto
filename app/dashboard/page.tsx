@@ -353,21 +353,7 @@ const PaymentMethodCard: React.FC<PaymentCardProps> = ({
   onRemove,
 }) => {
   return (
-    <div className="flex gap-2">
-  <button
-    onClick={() => onEdit(method.id)}
-    className="text-xs bg-gray-700 px-2 py-1 rounded-md"
-  >
-    Edit
-  </button>
-
-  <button
-    onClick={() => onRemove(method.id)}
-    className="text-xs bg-red-500 px-2 py-1 rounded-md"
-  >
-    Remove
-  </button>
-</div>
+    
     <div className="bg-gray-800 p-4 rounded-xl flex justify-between items-center">
       <div>
         <h3 className="font-semibold text-sm">{method.type}</h3>
