@@ -582,13 +582,13 @@ const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
 
         {type === "BANK" && (
           <BankForm onSave={onSave} method={
-          editingMethod?.type === "BankMethod"
+          editingMethod?.type === "BANK"
           ? editingMethod : undefined} />
         )}
 
         {type === "BINANCE" && (
           <BinanceForm onSave={onSave} method={
-          editingMethod?.type === "BankMethod"
+          editingMethod?.type === "BINANCE"
           ? editingMethod : undefined} />
         )}
 
