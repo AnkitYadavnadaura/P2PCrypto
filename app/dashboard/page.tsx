@@ -9,6 +9,11 @@ export default function Dashboard() {
   const [showAddMethod, setShowAddMethod] = useState(false);
 const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
 const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+const handleSaveMethod = (method: PaymentMethod) => {
+  setPaymentMethods((prev) => [...prev, method]);
+  setShowAddMethod(false);
+  setEditingMethod(null);
+};
 
 
   return (
