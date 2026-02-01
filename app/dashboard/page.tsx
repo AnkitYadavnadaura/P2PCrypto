@@ -136,16 +136,26 @@ export default function Dashboard() {
 
 /* ---------------- Components ---------------- */
 
-const ActionButton = ({ emoji, label, onClick, color }) => (
-  <button
-    onClick={onClick}
-    className={`bg-gradient-to-b from-${color}-400 to-${color}-600 text-gray-900 py-6 rounded-xl shadow-xl active:scale-95`}
-  >
-    {emoji}
-    <br />
-    {label}
-  </button>
-);
+const ActionButton = ({ emoji, label, onClick, color }) => {
+  const colorMap = {
+    yellow: "from-yellow-400 to-yellow-600",
+    blue: "from-blue-400 to-blue-600",
+    green: "from-green-400 to-green-600",
+    purple: "from-purple-400 to-purple-600",
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`bg-gradient-to-b ${colorMap[color]} text-gray-900 font-semibold py-6 rounded-xl shadow-xl active:scale-95 transition text-center text-sm`}
+    >
+      {emoji}
+      <br />
+      {label}
+    </button>
+  );
+};
+
 
 const TabButton = ({ active, children, onClick }) => (
   <button
