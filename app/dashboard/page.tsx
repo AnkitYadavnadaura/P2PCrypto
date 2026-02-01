@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
+import { PaymentMethod } from "@/types/payment";
 export default function Dashboard() {
   const [section, setSection] = useState("home");
   const [marketTab, setMarketTab] = useState("buy");
@@ -124,6 +125,13 @@ export default function Dashboard() {
         {section === "profile" && (
           <section className="p-4">
             <h2 className="text-xl font-semibold mb-3">My Profile</h2>
+            <div className="grid grid-cols-2 gap-3">
+  <StatCard label="Total Trades" value={24} />
+  <StatCard label="Successful Trades" value={21} />
+  <StatCard label="Payment Methods" value={3} />
+  <StatCard label="Cancelled Trades" value={2} />
+</div>
+
             <button className="w-full bg-yellow-500 text-black py-3 rounded-lg font-bold">
               + List New Ad
             </button>
@@ -307,4 +315,138 @@ const ComingSoonCard: React.FC<ComingSoonCardProps> = ({ title, icon }) => {
     </div>
   );
 };
+
+
+interface StatProps {
+  label: string;
+  value: number | string;
+}
+
+const StatCard: React.FC<StatProps> = ({ label, value }) => (
+  <div className="bg-gray-800 rounded-xl p-4 text-center">
+    <p className="text-xs text-gray-400">{label}</p>
+    <p className="text-lg font-semibold">{value}</p>
+  </div>
+);
+
+
+interface PaymentCardProps {
+  method: PaymentMethod;
+  onEdit: (id: string) => void;
+  onRemove: (id: string) => void;
+}
+
+const PaymentMethodCard: React.FC<PaymentCardProps> = ({
+  method,
+  onEdit,
+  onRemove,
+}) => {
+  return (
+    <div className="bg-gray-800 p-4 rounded-xl flex justify-between items-center">
+      <div>
+        <h3 className="font-semibold text-sm">{method.type}</h3>
+
+        {method.type === "UPI" && (
+          <p className="text-xs text-gray-400">{method.upiId}</p>
+        )}
+
+        {method.type === "BANK" && (
+          <p className="text-xs text-gray-400">
+            {method.bankName} • ****{method.accountNumber.slice(-4)}
+          </p>
+        )}
+
+        {method.type === "BINANCE" && (
+          <p className="text-xs text-gray-400">
+            Binance Pay {method.binanceId ? "ID" : "QR"}
+          </p>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={() => onEdit(method.id)}>✏️</button>
+        <button onClick={() => onRemove(method.id)}>🗑</button>
+      </div>
+    </div>
+  );
+};
+
+
+interface AddMethodProps {
+  onClose: () => void;
+  onSave: (method: PaymentMethod) => void;
+}
+
+const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
+  onClose,
+  onSave,
+}) => {
+  const [type, setType] = useState<PaymentMethodType>("UPI");
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-end">
+      <div className="bg-gray-900 w-full rounded-t-2xl p-5">
+        <h2 className="font-semibold mb-3">Add Payment Method</h2>
+
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as PaymentMethodType)}
+          className="w-full bg-gray-800 p-3 rounded-lg mb-4"
+        >
+          <option value="UPI">UPI</option>
+          <option value="BANK">Bank Transfer</option>
+          <option value="BINANCE">Binance Pay</option>
+        </select>
+
+        {type === "UPI" && <UPIForm onSave={onSave} />}
+        {type === "BANK" && <BankForm onSave={onSave} />}
+        {type === "BINANCE" && <BinanceForm onSave={onSave} />}
+
+        <button onClick={onClose} className="mt-4 text-sm text-gray-400">
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
+interface UPIFormProps {
+  onSave: (method: PaymentMethod) => void;
+}
+
+const UPIForm: React.FC<UPIFormProps> = ({ onSave }) => {
+  const [upiId, setUpiId] = useState("");
+
+  const handleSave = () => {
+    onSave({
+      id: crypto.randomUUID(),
+      type: "UPI",
+      upiId,
+      qrUrl: "uploaded_qr_url",
+      createdAt: Date.now(),
+    });
+  };
+
+  return (
+    <>
+      <input
+        placeholder="UPI ID"
+        value={upiId}
+        onChange={(e) => setUpiId(e.target.value)}
+        className="w-full bg-gray-800 p-3 rounded-lg mb-3"
+      />
+
+      <button
+        onClick={handleSave}
+        className="w-full bg-green-500 text-black py-3 rounded-xl"
+      >
+        Save UPI Method
+      </button>
+    </>
+  );
+};
+
+
+
 
