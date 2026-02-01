@@ -617,6 +617,7 @@ const UPIForm: React.FC<UPIFormProps> = ({ onSave, method }) => {
       id: method?.id ?? crypto.randomUUID(),
       type: "UPI",
       upiId,
+      qrUrl: method?.qrUrl ?? "",
       createdAt: method?.createdAt ?? Date.now(),
     });
   };
