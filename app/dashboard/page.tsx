@@ -377,6 +377,106 @@ interface AddMethodProps {
   onSave: (method: PaymentMethod) => void;
 }
 
+interface BankFormProps {
+  onSave: (method: PaymentMethod) => void;
+}
+
+const BankForm: React.FC<BankFormProps> = ({ onSave }) => {
+  const [holderName, setHolderName] = useState("");
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [ifsc, setIfsc] = useState("");
+
+  const handleSave = () => {
+    onSave({
+      id: crypto.randomUUID(),
+      type: "BANK",
+      holderName,
+      bankName,
+      accountNumber,
+      ifsc,
+      createdAt: Date.now(),
+    });
+  };
+
+  return (
+    <>
+      <input
+        placeholder="Account Holder Name"
+        value={holderName}
+        onChange={(e) => setHolderName(e.target.value)}
+        className="w-full bg-gray-800 p-3 rounded-lg mb-2"
+      />
+
+      <input
+        placeholder="Bank Name"
+        value={bankName}
+        onChange={(e) => setBankName(e.target.value)}
+        className="w-full bg-gray-800 p-3 rounded-lg mb-2"
+      />
+
+      <input
+        placeholder="Account Number"
+        value={accountNumber}
+        onChange={(e) => setAccountNumber(e.target.value)}
+        className="w-full bg-gray-800 p-3 rounded-lg mb-2"
+      />
+
+      <input
+        placeholder="IFSC Code"
+        value={ifsc}
+        onChange={(e) => setIfsc(e.target.value)}
+        className="w-full bg-gray-800 p-3 rounded-lg mb-4"
+      />
+
+      <button
+        onClick={handleSave}
+        className="w-full bg-blue-500 text-black py-3 rounded-xl"
+      >
+        Save Bank Method
+      </button>
+    </>
+  );
+};
+
+
+interface BinanceFormProps {
+  onSave: (method: PaymentMethod) => void;
+}
+
+const BinanceForm: React.FC<BinanceFormProps> = ({ onSave }) => {
+  const [binanceId, setBinanceId] = useState("");
+
+  const handleSave = () => {
+    onSave({
+      id: crypto.randomUUID(),
+      type: "BINANCE",
+      binanceId,
+      qrUrl: "uploaded_binance_qr_url",
+      createdAt: Date.now(),
+    });
+  };
+
+  return (
+    <>
+      <input
+        placeholder="Binance Pay ID (optional)"
+        value={binanceId}
+        onChange={(e) => setBinanceId(e.target.value)}
+        className="w-full bg-gray-800 p-3 rounded-lg mb-4"
+      />
+
+      <button
+        onClick={handleSave}
+        className="w-full bg-yellow-500 text-black py-3 rounded-xl"
+      >
+        Save Binance Method
+      </button>
+    </>
+  );
+};
+
+
 const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
   onClose,
   onSave,
