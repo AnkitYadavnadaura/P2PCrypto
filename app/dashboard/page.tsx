@@ -128,6 +128,17 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-3">
   <StatCard label="Total Trades" value={24} />
   <StatCard label="Successful Trades" value={21} />
+  <div className="flex justify-between items-center mb-3">
+  <h2 className="font-semibold text-sm">Payment Methods</h2>
+
+  <button
+    onClick={() => setShowAddMethod(true)}
+    className="text-xs bg-gray-700 px-3 py-1 rounded-lg"
+  >
+    + Add Method
+  </button>
+</div>
+
   <StatCard label="Payment Methods" value={3} />
   <StatCard label="Cancelled Trades" value={2} />
 </div>
@@ -321,7 +332,7 @@ interface StatProps {
   label: string;
   value: number | string;
 }
-
+const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
 const StatCard: React.FC<StatProps> = ({ label, value }) => (
   <div className="bg-gray-800 rounded-xl p-4 text-center">
     <p className="text-xs text-gray-400">{label}</p>
@@ -342,6 +353,21 @@ const PaymentMethodCard: React.FC<PaymentCardProps> = ({
   onRemove,
 }) => {
   return (
+    <div className="flex gap-2">
+  <button
+    onClick={() => onEdit(method.id)}
+    className="text-xs bg-gray-700 px-2 py-1 rounded-md"
+  >
+    Edit
+  </button>
+
+  <button
+    onClick={() => onRemove(method.id)}
+    className="text-xs bg-red-500 px-2 py-1 rounded-md"
+  >
+    Remove
+  </button>
+</div>
     <div className="bg-gray-800 p-4 rounded-xl flex justify-between items-center">
       <div>
         <h3 className="font-semibold text-sm">{method.type}</h3>
