@@ -22,7 +22,7 @@ export default function Dashboard() {
             <ActionButton label="Mobile Recharge" emoji="📱" onClick={() => setSection("recharge")} color="blue" />
             <ActionButton label="Chat Support" emoji="💬" onClick={() => setSection("chat")} color="green" />
             <ActionButton label="Wallet" emoji="💼" onClick={() => setSection("coming")} color="purple" />
-          </section>
+          
       {/* Coming Soon Features */}
 <div className="col-span-2 mt-2 grid grid-cols-2 gap-3">
   <ComingSoonCard title="Crypto Loans" icon="💳" />
@@ -30,7 +30,7 @@ export default function Dashboard() {
   <ComingSoonCard title="Escrow Protection" icon="🔐" />
   <ComingSoonCard title="Global Payments" icon="🌍" />
 </div>
-
+</section>
         )}
 
         {/* Market */}
