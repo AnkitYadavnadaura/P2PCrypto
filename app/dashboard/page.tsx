@@ -10,10 +10,35 @@ export default function Dashboard() {
 const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
 const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 const handleSaveMethod = (method: PaymentMethod) => {
-  setPaymentMethods((prev) => [...prev, method]);
-  setShowAddMethod(false);
+  setPaymentMethods((prev) => {
+    // EDIT mode
+    if (editingMethod) {
+      return prev.map((m) =>
+        m.id === editingMethod.id ? { ...method, id: editingMethod.id } : m
+      );
+    }
+
+    // ADD mode
+    return [...prev, method];
+  });
+
   setEditingMethod(null);
+  setShowAddMethod(false);
 };
+
+// Load
+useEffect(() => {
+  const stored = localStorage.getItem("paymentMethods");
+  if (stored) {
+    setPaymentMethods(JSON.parse(stored));
+  }
+}, []);
+
+// Save
+useEffect(() => {
+  localStorage.setItem("paymentMethods", JSON.stringify(paymentMethods));
+}, [paymentMethods]);
+
 
 
   return (
@@ -137,7 +162,11 @@ const handleSaveMethod = (method: PaymentMethod) => {
             <div className="grid grid-cols-2 gap-3">
   <StatCard label="Total Trades" value={24} />
   <StatCard label="Successful Trades" value={21} />
-  <div className="flex justify-between items-center mb-3">
+  
+  <StatCard label="Payment Methods" value={3} />
+  <StatCard label="Cancelled Trades" value={2} />
+</div>
+            <div className="flex justify-between items-center mb-3">
   <h2 className="font-semibold text-sm">Payment Methods</h2>
 
   <button
@@ -148,9 +177,6 @@ const handleSaveMethod = (method: PaymentMethod) => {
   </button>
 </div>
 
-  <StatCard label="Payment Methods" value={3} />
-  <StatCard label="Cancelled Trades" value={2} />
-</div>
             <div className="space-y-3 mt-3">
   {paymentMethods.length === 0 && (
     <p className="text-xs text-gray-400 text-center">
@@ -190,12 +216,17 @@ const handleSaveMethod = (method: PaymentMethod) => {
         <NavBtn icon="🧾" label="Orders" onClick={() => setSection("orders")} />
         <NavBtn icon="👤" label="Profile" onClick={() => setSection("profile")} />
       </nav>
-        {showAddMethod && (
+       {showAddMethod && (
   <AddPaymentMethodModal
-    onClose={() => setShowAddMethod(false)}
+    onClose={() => {
+      setShowAddMethod(false);
+      setEditingMethod(null);
+    }}
     onSave={handleSaveMethod}
+    editingMethod={editingMethod}   // 👈 add this
   />
 )}
+
     </div>
   
 
@@ -427,7 +458,9 @@ const PaymentMethodCard: React.FC<PaymentCardProps> = ({
 interface AddMethodProps {
   onClose: () => void;
   onSave: (method: PaymentMethod) => void;
+  editingMethod: PaymentMethod | null;
 }
+
 
 interface BankFormProps {
   onSave: (method: PaymentMethod) => void;
