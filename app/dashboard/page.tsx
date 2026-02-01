@@ -468,7 +468,7 @@ interface BankFormProps {
 }
 
 const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
-  const [accountName, setAccountName] = useState(method?.holderName || "");
+  const [holderName, setholderName] = useState(method?.holderName || "");
   const [accountNumber, setAccountNumber] = useState(method?.accountNumber || "");
   const [ifsc, setIfsc] = useState(method?.ifsc || "");
   const [bankName, setBankName] = useState(method?.bankName || "");
