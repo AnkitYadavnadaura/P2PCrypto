@@ -464,100 +464,81 @@ interface AddMethodProps {
 
 interface BankFormProps {
   onSave: (method: PaymentMethod) => void;
+  method?: PaymentMethod;
 }
 
-const BankForm: React.FC<BankFormProps> = ({ onSave }) => {
-  const [holderName, setHolderName] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [ifsc, setIfsc] = useState("");
+const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
+  const [accountName, setAccountName] = useState(method?.accountName || "");
+  const [accountNumber, setAccountNumber] = useState(method?.accountNumber || "");
+  const [ifsc, setIfsc] = useState(method?.ifsc || "");
+  const [bankName, setBankName] = useState(method?.bankName || "");
 
   const handleSave = () => {
     onSave({
-      id: crypto.randomUUID(),
+      ...(method ?? {}),
+      id: method?.id ?? crypto.randomUUID(),
       type: "BANK",
-      holderName,
-      bankName,
+      accountName,
       accountNumber,
       ifsc,
-      createdAt: Date.now(),
+      bankName,
+      createdAt: method?.createdAt ?? Date.now(),
     });
   };
 
   return (
-    <>
-      <input
-        placeholder="Account Holder Name"
-        value={holderName}
-        onChange={(e) => setHolderName(e.target.value)}
-        className="w-full bg-gray-800 p-3 rounded-lg mb-2"
-      />
+    <div className="space-y-3">
+      <input placeholder="Account Holder Name" value={accountName}
+        onChange={(e) => setAccountName(e.target.value)} className="input" />
 
-      <input
-        placeholder="Bank Name"
-        value={bankName}
-        onChange={(e) => setBankName(e.target.value)}
-        className="w-full bg-gray-800 p-3 rounded-lg mb-2"
-      />
+      <input placeholder="Account Number" value={accountNumber}
+        onChange={(e) => setAccountNumber(e.target.value)} className="input" />
 
-      <input
-        placeholder="Account Number"
-        value={accountNumber}
-        onChange={(e) => setAccountNumber(e.target.value)}
-        className="w-full bg-gray-800 p-3 rounded-lg mb-2"
-      />
+      <input placeholder="IFSC Code" value={ifsc}
+        onChange={(e) => setIfsc(e.target.value)} className="input" />
 
-      <input
-        placeholder="IFSC Code"
-        value={ifsc}
-        onChange={(e) => setIfsc(e.target.value)}
-        className="w-full bg-gray-800 p-3 rounded-lg mb-4"
-      />
+      <input placeholder="Bank Name" value={bankName}
+        onChange={(e) => setBankName(e.target.value)} className="input" />
 
-      <button
-        onClick={handleSave}
-        className="w-full bg-blue-500 text-black py-3 rounded-xl"
-      >
+      <button onClick={handleSave} className="btn-primary w-full">
         Save Bank Method
       </button>
-    </>
+    </div>
   );
 };
 
 
 interface BinanceFormProps {
   onSave: (method: PaymentMethod) => void;
+  method?: PaymentMethod;
 }
 
-const BinanceForm: React.FC<BinanceFormProps> = ({ onSave }) => {
-  const [binanceId, setBinanceId] = useState("");
+const BinanceForm: React.FC<BinanceFormProps> = ({ onSave, method }) => {
+  const [binanceId, setBinanceId] = useState(method?.binanceId || "");
 
   const handleSave = () => {
     onSave({
-      id: crypto.randomUUID(),
+      ...(method ?? {}),
+      id: method?.id ?? crypto.randomUUID(),
       type: "BINANCE",
       binanceId,
-      qrUrl: "uploaded_binance_qr_url",
-      createdAt: Date.now(),
+      createdAt: method?.createdAt ?? Date.now(),
     });
   };
 
   return (
-    <>
+    <div className="space-y-3">
       <input
-        placeholder="Binance Pay ID (optional)"
+        placeholder="Binance Pay ID / Email"
         value={binanceId}
         onChange={(e) => setBinanceId(e.target.value)}
-        className="w-full bg-gray-800 p-3 rounded-lg mb-4"
+        className="input"
       />
 
-      <button
-        onClick={handleSave}
-        className="w-full bg-yellow-500 text-black py-3 rounded-xl"
-      >
-        Save Binance Method
+      <button onClick={handleSave} className="btn-primary w-full">
+        Save Binance Pay
       </button>
-    </>
+    </div>
   );
 };
 
@@ -565,13 +546,18 @@ const BinanceForm: React.FC<BinanceFormProps> = ({ onSave }) => {
 const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
   onClose,
   onSave,
+  editingMethod,
 }) => {
-  const [type, setType] = useState<PaymentMethodType>("UPI");
+  const [type, setType] = useState<PaymentMethodType>(
+    editingMethod?.type ?? "UPI"
+  );
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-end">
       <div className="bg-gray-900 w-full rounded-t-2xl p-5">
-        <h2 className="font-semibold mb-3">Add Payment Method</h2>
+        <h2 className="font-semibold mb-3">
+          {editingMethod ? "Edit Payment Method" : "Add Payment Method"}
+        </h2>
 
         <select
           value={type}
@@ -583,9 +569,17 @@ const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
           <option value="BINANCE">Binance Pay</option>
         </select>
 
-        {type === "UPI" && <UPIForm onSave={onSave} />}
-        {type === "BANK" && <BankForm onSave={onSave} />}
-        {type === "BINANCE" && <BinanceForm onSave={onSave} />}
+        {type === "UPI" && (
+          <UPIForm onSave={onSave} method={editingMethod ?? undefined} />
+        )}
+
+        {type === "BANK" && (
+          <BankForm onSave={onSave} method={editingMethod ?? undefined} />
+        )}
+
+        {type === "BINANCE" && (
+          <BinanceForm onSave={onSave} method={editingMethod ?? undefined} />
+        )}
 
         <button onClick={onClose} className="mt-4 text-sm text-gray-400">
           Cancel
@@ -596,20 +590,23 @@ const AddPaymentMethodModal: React.FC<AddMethodProps> = ({
 };
 
 
+
+
 interface UPIFormProps {
   onSave: (method: PaymentMethod) => void;
+  method?: PaymentMethod;
 }
 
-const UPIForm: React.FC<UPIFormProps> = ({ onSave }) => {
-  const [upiId, setUpiId] = useState("");
+const UPIForm: React.FC<UPIFormProps> = ({ onSave, method }) => {
+  const [upiId, setUpiId] = useState(method?.upiId || "");
 
   const handleSave = () => {
     onSave({
-      id: crypto.randomUUID(),
+      ...(method ?? {}),
+      id: method?.id ?? crypto.randomUUID(),
       type: "UPI",
       upiId,
-      qrUrl: "uploaded_qr_url",
-      createdAt: Date.now(),
+      createdAt: method?.createdAt ?? Date.now(),
     });
   };
 
@@ -626,7 +623,7 @@ const UPIForm: React.FC<UPIFormProps> = ({ onSave }) => {
         onClick={handleSave}
         className="w-full bg-green-500 text-black py-3 rounded-xl"
       >
-        Save UPI Method
+        {method ? "Update UPI Method" : "Save UPI Method"}
       </button>
     </>
   );
