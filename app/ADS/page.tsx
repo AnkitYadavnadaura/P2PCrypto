@@ -1,5 +1,6 @@
 'use client';
 import { useState } from "react";
+import React from "react";
 
 export default function ListNewAd() {
   const [form, setForm] = useState({
@@ -10,9 +11,15 @@ export default function ListNewAd() {
     cta: ""
   });
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+ const handleChange = (
+  e: React.ChangeEvent<
+    HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+  >
+) => {
+  const { name, value } = e.target;
+  setForm((prev) => ({ ...prev, [name]: value }));
+};
+
 
   const handleSubmit = () => {
     console.log("Ad Data:", form);
