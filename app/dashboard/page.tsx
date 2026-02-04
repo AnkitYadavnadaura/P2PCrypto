@@ -166,6 +166,7 @@ useEffect(() => {
   <StatCard label="Payment Methods" value={3} />
   <StatCard label="Cancelled Trades" value={2} />
 </div>
+            <br />
             <div className="flex justify-between items-center mb-3">
   <h2 className="font-semibold text-sm">Payment Methods</h2>
 
@@ -200,7 +201,7 @@ useEffect(() => {
     />
   ))}
 </div>
-
+<br />
 
             <button className="w-full bg-yellow-500 text-black py-3 rounded-lg font-bold">
               + List New Ad
@@ -489,19 +490,20 @@ const BankForm: React.FC<BankFormProps> = ({ onSave, method }) => {
   return (
     <div className="space-y-3">
       <input placeholder="Account Holder Name" value={holderName}
-        onChange={(e) => setholderName(e.target.value)} className="input" />
+        onChange={(e) => setholderName(e.target.value)} className="input w-full bg-gray-800 p-3 rounded-lg mb-3" />
 
       <input placeholder="Account Number" value={accountNumber}
-        onChange={(e) => setAccountNumber(e.target.value)} className="input" />
+        onChange={(e) => setAccountNumber(e.target.value)} className="input w-full bg-gray-800 p-3 rounded-lg mb-3" />
 
       <input placeholder="IFSC Code" value={ifsc}
-        onChange={(e) => setIfsc(e.target.value)} className="input" />
+        onChange={(e) => setIfsc(e.target.value)} className="input w-full bg-gray-800 p-3 rounded-lg mb-3" />
 
       <input placeholder="Bank Name" value={bankName}
-        onChange={(e) => setBankName(e.target.value)} className="input" />
+        onChange={(e) => setBankName(e.target.value)} className="input w-full bg-gray-800 p-3 rounded-lg mb-3" />
 
-      <button onClick={handleSave} className="btn-primary w-full">
+      <button onClick={handleSave} className="btn-primary w-full bg-green-500 text-black py-3 rounded-xl">
         Save Bank Method
+        {method ? "Update Bank Method" : "Save Bank Method"}
       </button>
     </div>
   );
@@ -532,11 +534,12 @@ const BinanceForm: React.FC<BinanceFormProps> = ({ onSave, method }) => {
         placeholder="Binance Pay ID / Email"
         value={binanceId}
         onChange={(e) => setBinanceId(e.target.value)}
-        className="input"
+        className="input w-full bg-gray-800 p-3 rounded-lg mb-3"
       />
 
-      <button onClick={handleSave} className="btn-primary w-full">
-        Save Binance Pay
+      <button onClick={handleSave} className="btn-primary w-full bg-green-500 text-black py-3 rounded-xl">
+        
+        {method ? "Update Binance Pay" : "Save Binance Pay"}
       </button>
     </div>
   );
