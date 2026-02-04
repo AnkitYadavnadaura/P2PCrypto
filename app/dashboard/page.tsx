@@ -203,7 +203,7 @@ useEffect(() => {
 </div>
 <br />
 
-            <button className="w-full bg-yellow-500 text-black py-3 rounded-lg font-bold">
+            <button onClick={()=>window.location.href = '/ADS'} className="w-full bg-yellow-500 text-black py-3 rounded-lg font-bold">
               + List New Ad
             </button>
           </section>
