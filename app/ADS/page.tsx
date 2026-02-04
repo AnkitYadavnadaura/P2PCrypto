@@ -1,111 +1,103 @@
 'use client';
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-export default function AddNewAd() {
-  const navigate = useNavigate();
-
-  const [ad, setAd] = useState({
-    asset: "",
-    type: "sell",
+export default function ListNewAd() {
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    category: "",
     price: "",
-    min: "",
-    max: "",
-    payment: "",
-    terms: ""
+    cta: ""
   });
 
-  const handleChange = (e) =>
-    setAd({ ...ad, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = () => {
+    console.log("Ad Data:", form);
+  };
 
   return (
-    <div className="max-w-xl">
-
+    <div className="min-h-screen bg-black text-white p-4">
+      
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Add New Ad</h2>
-        <button
-          onClick={() => navigate(-1)}
-          className="text-sm text-zinc-400"
-        >
-          Cancel
-        </button>
-      </div>
+      <h1 className="text-xl font-semibold mb-4">
+        List New Ad
+      </h1>
 
+      {/* Form */}
       <div className="space-y-4">
 
-        <select
-          name="asset"
-          onChange={handleChange}
-          className="w-full p-3 bg-zinc-900 rounded-xl"
-        >
-          <option value="">Select Asset</option>
-          <option value="USDT">USDT</option>
-          <option value="BTC">BTC</option>
-        </select>
-
-        <div className="flex gap-3">
-          <button
-            onClick={() => setAd({ ...ad, type: "buy" })}
-            className={`flex-1 py-2 rounded-xl ${
-              ad.type === "buy" ? "bg-green-600" : "bg-zinc-800"
-            }`}
-          >
-            Buy
-          </button>
-          <button
-            onClick={() => setAd({ ...ad, type: "sell" })}
-            className={`flex-1 py-2 rounded-xl ${
-              ad.type === "sell" ? "bg-red-600" : "bg-zinc-800"
-            }`}
-          >
-            Sell
-          </button>
-        </div>
-
+        {/* Title */}
         <input
-          name="price"
-          placeholder="Price"
-          className="w-full p-3 bg-zinc-900 rounded-xl"
+          type="text"
+          name="title"
+          placeholder="Ad Title"
+          value={form.title}
           onChange={handleChange}
+          className="w-full p-3 rounded-xl bg-zinc-900 outline-none"
         />
 
-        <div className="flex gap-3">
-          <input
-            name="min"
-            placeholder="Min Limit"
-            className="w-full p-3 bg-zinc-900 rounded-xl"
-            onChange={handleChange}
-          />
-          <input
-            name="max"
-            placeholder="Max Limit"
-            className="w-full p-3 bg-zinc-900 rounded-xl"
-            onChange={handleChange}
-          />
-        </div>
-
-        <select
-          name="payment"
-          className="w-full p-3 bg-zinc-900 rounded-xl"
+        {/* Description */}
+        <textarea
+          name="description"
+          placeholder="Ad Description"
+          value={form.description}
           onChange={handleChange}
+          rows={4}
+          className="w-full p-3 rounded-xl bg-zinc-900 outline-none"
+        />
+
+        {/* Category */}
+        <select
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          className="w-full p-3 rounded-xl bg-zinc-900"
         >
-          <option value="">Payment Method</option>
-          <option value="upi">UPI</option>
-          <option value="bank">Bank</option>
+          <option value="">Select Category</option>
+          <option value="crypto">Crypto</option>
+          <option value="gaming">Gaming</option>
+          <option value="education">Education</option>
         </select>
 
-        <textarea
-          name="terms"
-          placeholder="Terms"
-          rows={3}
-          className="w-full p-3 bg-zinc-900 rounded-xl"
+        {/* Media Upload */}
+        <div className="border border-dashed border-zinc-700 rounded-xl p-4 text-center">
+          <p className="text-sm text-zinc-400">
+            Upload Image / Video
+          </p>
+          <input type="file" className="mt-2 text-sm" />
+        </div>
+
+        {/* Price */}
+        <input
+          type="number"
+          name="price"
+          placeholder="Ad Budget (USD)"
+          value={form.price}
           onChange={handleChange}
+          className="w-full p-3 rounded-xl bg-zinc-900 outline-none"
         />
 
-        <button className="w-full bg-blue-600 py-3 rounded-xl">
-          Post Ad
+        {/* CTA */}
+        <input
+          type="text"
+          name="cta"
+          placeholder="Call to Action (e.g. Install Now)"
+          value={form.cta}
+          onChange={handleChange}
+          className="w-full p-3 rounded-xl bg-zinc-900 outline-none"
+        />
+
+        {/* Submit */}
+        <button
+          onClick={handleSubmit}
+          className="w-full bg-blue-600 py-3 rounded-xl font-medium"
+        >
+          Publish Ad
         </button>
+
       </div>
     </div>
   );
