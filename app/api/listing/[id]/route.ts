@@ -26,7 +26,7 @@ export async function PATCH(
     /* =========================
        AUTHORIZATION CHECK
        ========================= */
-    const listing = await prisma.listing.findUnique({
+    const listing = await prisma.listing.findMany({
       where: { userId: walletAddress,
         type:type,
 
