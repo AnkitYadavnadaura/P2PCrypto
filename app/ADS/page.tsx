@@ -292,7 +292,6 @@ useEffect(() => {
 
         <button
           onClick={handleSubmit}
-          disabled={loading}
           className="w-full bg-green-600 py-3 rounded-xl font-semibold disabled:opacity-50"
         >
           {loading
