@@ -117,7 +117,7 @@ export async function GET(request: Request) {
 
     const listings = await prisma.listing.findMany({
       where: {
-        walletAddress: wallet,
+        userId: wallet,
       },
       orderBy: {
         createdAt: "desc",
