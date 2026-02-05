@@ -114,6 +114,7 @@ export default function AdsDashboard() {
     alert(form.maxAmount)
     alert(form.balance)
     alert(form.paymentMethods)
+    alert(form.maxTime)
     alert(Number(form.maxTime.split(" ")[0]))
     const payload = {
       walletAddress,
