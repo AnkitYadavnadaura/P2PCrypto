@@ -125,7 +125,7 @@ try {
   console.error("❌ ERROR WHILE BUILDING PAYLOAD", err);
   alert("Payload error");
 }
-
+const payload = {};
     const isEdit = Boolean(editingAd?.id);
     alert("pass3")
     const url = isEdit
