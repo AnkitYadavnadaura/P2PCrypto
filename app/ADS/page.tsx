@@ -107,6 +107,7 @@ export default function AdsDashboard() {
       alert("Price and max amount required");
       return;
     }
+    alert("Pass1")
 
     const payload = {
       walletAddress,
@@ -119,8 +120,10 @@ export default function AdsDashboard() {
       paymentMethods: form.paymentMethods,
       maxTimeMinutes: Number(form.maxTime.split(" ")[0]),
     };
+    alert("pass2")
 
     const isEdit = Boolean(editingAd?.id);
+    alert("pass3")
     const url = isEdit
       ? `/api/listing/${editingAd!.id}`
       : `/api/listing`;
