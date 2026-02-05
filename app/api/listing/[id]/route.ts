@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  { params }: { params: any } // 👈 IMPORTANT
 ) {
   try {
-    const id = context.params.id;
+    const id = params.id;
     const body = await request.json();
 
     return NextResponse.json({
