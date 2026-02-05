@@ -1,15 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
   req: Request,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = context.params;
   try {
-    const listingId = id;
+    const { id } = params;
     const body = await req.json();
 
     const {
@@ -20,14 +17,17 @@ export async function PATCH(
       balance,
       paymentMethods,
       maxTimeMinutes,
-      status,
     } = body;
 
-    /* =========================
-       AUTHORIZATION CHECK
-       ========================= */
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: "Wallet address required" },
+        { status: 400 }
+      );
+    }
+
     const listing = await prisma.listing.findUnique({
-      where: { id: listingId },
+      where: { id },
     });
 
     if (!listing) {
@@ -37,47 +37,29 @@ export async function PATCH(
       );
     }
 
-    if (listing.userId !== walletAddress) {
+    // 🔒 ownership check
+    if (listing.walletAddress !== walletAddress) {
       return NextResponse.json(
-        { error: "Not allowed to edit this listing" },
+        { error: "Unauthorized" },
         { status: 403 }
       );
     }
 
-    /* =========================
-       BUSINESS RULES
-       ========================= */
-    if (listing.type === "SELL" && balance !== undefined) {
-      if (Number(balance) < Number(listing.minAmount)) {
-        return NextResponse.json(
-          { error: "Balance too low" },
-          { status: 400 }
-        );
-      }
-    }
-
-    /* =========================
-       UPDATE LISTING
-       ========================= */
     const updated = await prisma.listing.update({
-      where: { id: listingId },
+      where: { id },
       data: {
-        price: price ? new Prisma.Decimal(price) : undefined,
-        minAmount: minAmount ? new Prisma.Decimal(minAmount) : undefined,
-        maxAmount: maxAmount ? new Prisma.Decimal(maxAmount) : undefined,
-        balance: balance !== undefined
-          ? new Prisma.Decimal(balance)
-          : undefined,
+        priceValue: Number(price),
+        minAmount,
+        maxAmount,
+        balance: Number(balance),
         paymentMethods,
         maxTimeMinutes,
-        status,
       },
     });
 
-    return NextResponse.json({ listing: updated });
-
+    return NextResponse.json(updated);
   } catch (err) {
-    console.error("UPDATE LISTING ERROR:", err);
+    console.error(err);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
