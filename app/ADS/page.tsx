@@ -55,6 +55,7 @@ export default function AdsDashboard() {
     .then(res => res.json())
     .then(data => {
       setAds(data.listings || []);
+      switchTab("BUY")
     })
     .catch(err => console.error(err));
 }, [walletAddress]);
@@ -106,7 +107,7 @@ export default function AdsDashboard() {
       alert("Price and max amount required");
       return;
     }
-    if(form.maxTime == "undefined"){
+    if(form.maxTime == undefined){
       form.maxTime = "15 mins"
     }
     const payload = {
