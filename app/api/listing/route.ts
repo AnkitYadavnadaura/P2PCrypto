@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
 
       const existing = await prisma.listing.findFirst({
       where: {
-        walletAddress,
+        userId :walletAddress,
         type,
       },
     });
