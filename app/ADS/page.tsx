@@ -19,6 +19,9 @@ export default function AdsDashboard() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [editingAd, setEditingAd] = useState<Ad | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ads, setAds] = useState<Ad[]>([]);
+
+  
 
   const emptyForm: Ad = {
     type: activeTab,
@@ -40,6 +43,17 @@ export default function AdsDashboard() {
       setWalletAddress(stored);
     }
   }, []);
+  useEffect(() => {
+  if (!walletAddress) return;
+
+  fetch(`/api/listing?wallet=${walletAddress}`)
+    .then(res => res.json())
+    .then(data => {
+      setAds(data.listings || []);
+    })
+    .catch(err => console.error(err));
+}, [walletAddress]);
+
 
   /* =========================
      TAB SWITCH
@@ -121,6 +135,13 @@ export default function AdsDashboard() {
       }
 
       alert(isEdit ? "Ad updated successfully" : "Ad created successfully");
+      const savedAd = data.listing;
+
+      setAds(prev => {
+        const filtered = prev.filter(a => a.id !== savedAd.id);
+        return [...filtered, savedAd];
+      });
+
 
       // reset state
       setEditingAd(null);
@@ -157,6 +178,43 @@ export default function AdsDashboard() {
           </button>
         ))}
       </div>
+      {/* Ads LIST */}
+      {/* ADS LIST */}
+<div className="space-y-4 mb-6">
+  {ads
+    .filter(ad => ad.type === activeTab)
+    .map(ad => (
+      <div
+        key={ad.id}
+        className="bg-zinc-900 p-4 rounded-xl border border-zinc-800"
+      >
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold">{ad.type} Ad</h3>
+        </div>
+
+        <p className="text-sm mt-2">💰 Price: {ad.price}</p>
+        <p className="text-sm">📦 Max: {ad.maxAmount}</p>
+        <p className="text-sm">💳 {ad.paymentMethods.join(", ")}</p>
+        <p className="text-sm">🏦 Balance: {ad.balance}</p>
+
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={() => startEdit(ad)}
+            className="flex-1 bg-blue-600 py-2 rounded-xl"
+          >
+            Edit
+          </button>
+        </div>
+      </div>
+    ))}
+
+  {ads.filter(ad => ad.type === activeTab).length === 0 && (
+    <p className="text-center text-zinc-400 text-sm">
+      No {activeTab} ads created yet
+    </p>
+  )}
+</div>
+
 
       {/* FORM */}
       <div className="space-y-3 bg-zinc-900 p-4 rounded-xl">
