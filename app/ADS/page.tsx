@@ -101,6 +101,7 @@ export default function AdsDashboard() {
       alert("Wallet not connected");
       return;
     }
+    alert("Entering")
 
     if (!form.price || !form.maxAmount) {
       alert("Price and max amount required");
