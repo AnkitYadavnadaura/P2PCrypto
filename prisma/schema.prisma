@@ -15,14 +15,48 @@ model User {
   createdAt    DateTime @default(now())
 }
 
-model Listing {
-  id         String  @id @default(uuid())
-  sellerId   String?
-  title      String?
-  cryptoSymbol String?
-  priceValue Float?
-  createdAt  DateTime @default(now())
+enum ListingType {
+  BUY
+  SELL
 }
+
+enum ListingStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+}
+
+
+model Listing {
+  id              String        @id @default(uuid())
+
+  /// Who created the ad
+  userId          String
+
+  /// BUY or SELL
+  type            ListingType
+
+  /// Crypto details
+  cryptoSymbol    String        // e.g. BTC, USDT
+  price           Decimal       // price per unit
+
+  /// Limits
+  minAmount       Decimal
+  maxAmount       Decimal
+
+  /// Total balance available (only meaningful for SELL)
+  balance         Decimal
+
+  /// Payment & timing
+  paymentMethods  String[]      // ["UPI", "IMPS", "BANK"]
+  maxTimeMinutes  Int           // order completion time
+  status          ListingStatus @default(ACTIVE)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([type, cryptoSymbol, status])
+}
+
 
 model Order {
   id         String @id @default(uuid())

@@ -45,6 +45,7 @@ const signInWithWallet = async () => {
       if (data.success){
 		  //alert("Login successful!");
 		  if (data.success && data.redirect) {
+        localStorage.setItem("WalletAd", finalPayload.address);
   			window.location.href = data.redirect;
 		}
 	  }
