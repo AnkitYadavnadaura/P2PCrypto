@@ -19,18 +19,14 @@ export async function PATCH(
       balance,
       paymentMethods,
       maxTimeMinutes,
-      type,
       status,
     } = body;
 
     /* =========================
        AUTHORIZATION CHECK
        ========================= */
-    const listing = await prisma.listing.findMany({
-      where: { userId: walletAddress,
-        type:type,
-
-       },
+    const listing = await prisma.listing.findUnique({
+      where: { id: listingId },
     });
 
     if (!listing) {
@@ -63,10 +59,7 @@ export async function PATCH(
        UPDATE LISTING
        ========================= */
     const updated = await prisma.listing.update({
-      where: { userId: walletAddress,
-        type:type,
-
-       },
+      where: { id: listingId },
       data: {
         price: price ? new Prisma.Decimal(price) : undefined,
         minAmount: minAmount ? new Prisma.Decimal(minAmount) : undefined,
