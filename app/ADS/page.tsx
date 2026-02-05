@@ -187,7 +187,7 @@ export default function AdsDashboard() {
           <div>
             <p className="text-sm mb-1">Payment Methods</p>
             <div className="flex flex-wrap gap-2">
-              {["UPI", "Bank", "PayPal", "USDT"].map(method => (
+              {["UPI", "Bank", "Binance Pay"].map(method => (
                 <button
                   key={method}
                   onClick={() => handlePaymentToggle(method)}
