@@ -19,6 +19,7 @@ export async function PATCH(
       balance,
       paymentMethods,
       maxTimeMinutes,
+      type,
       status,
     } = body;
 
@@ -26,7 +27,10 @@ export async function PATCH(
        AUTHORIZATION CHECK
        ========================= */
     const listing = await prisma.listing.findUnique({
-      where: { id: listingId },
+      where: { userid: walletAddress,
+        type:type,
+
+       },
     });
 
     if (!listing) {
@@ -59,7 +63,10 @@ export async function PATCH(
        UPDATE LISTING
        ========================= */
     const updated = await prisma.listing.update({
-      where: { id: listingId },
+      where: { userid: walletAddress,
+        type:type,
+
+       },
       data: {
         price: price ? new Prisma.Decimal(price) : undefined,
         minAmount: minAmount ? new Prisma.Decimal(minAmount) : undefined,
