@@ -108,7 +108,7 @@ export default function AdsDashboard() {
       return;
     }
     alert("Pass1")
-
+try {
     const payload = {
       walletAddress,
       type: form.type,
@@ -121,6 +121,10 @@ export default function AdsDashboard() {
       maxTimeMinutes: Number(form.maxTime.split(" ")[0]),
     };
     alert("pass2")
+    } catch (err) {
+  console.error("❌ ERROR WHILE BUILDING PAYLOAD", err);
+  alert("Payload error");
+}
 
     const isEdit = Boolean(editingAd?.id);
     alert("pass3")
