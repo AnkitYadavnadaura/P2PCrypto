@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
+import { useParams } from 'next/navigation';
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH( req: Request) {
   try {
-    const { id } = params;
+     const params = useParams();
+  const orderId = params?.id;
     const body = await req.json();
 
     const {
