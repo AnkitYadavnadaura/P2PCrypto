@@ -27,7 +27,7 @@ export async function PATCH(
        AUTHORIZATION CHECK
        ========================= */
     const listing = await prisma.listing.findUnique({
-      where: { userid: walletAddress,
+      where: { userId: walletAddress,
         type:type,
 
        },
@@ -63,7 +63,7 @@ export async function PATCH(
        UPDATE LISTING
        ========================= */
     const updated = await prisma.listing.update({
-      where: { userid: walletAddress,
+      where: { userId: walletAddress,
         type:type,
 
        },

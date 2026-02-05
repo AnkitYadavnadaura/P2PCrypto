@@ -128,6 +128,7 @@ useEffect(() => {
     const url = isEdit
       ? `/api/listing/${editingAd!.id}`
       : `/api/listing`;
+      alert(url)
 
     const method = isEdit ? "PATCH" : "POST";
 
@@ -141,6 +142,7 @@ useEffect(() => {
       });
 
       const data = await res.json();
+      alert(data)
 
       if (!res.ok) {
         alert(data.error || "Request failed");
