@@ -50,6 +50,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+      const existing = await prisma.listing.findFirst({
+      where: {
+        walletAddress,
+        type,
+      },
+    });
+
+    if (existing) {
+      return NextResponse.json(
+        { error: `Only one ${type} ad allowed per wallet` },
+        { status: 409 }
+      );
+    }
+
     /* =========================
        BUSINESS RULES
        ========================= */
@@ -82,6 +96,37 @@ export async function POST(req: NextRequest) {
 
   } catch (err) {
     console.error("CREATE LISTING ERROR:", err);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const wallet = searchParams.get("wallet");
+
+    if (!wallet) {
+      return NextResponse.json(
+        { error: "Wallet address required" },
+        { status: 400 }
+      );
+    }
+
+    const listings = await prisma.listing.findMany({
+      where: {
+        walletAddress: wallet,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return NextResponse.json({ listings });
+  } catch (error) {
+    console.error("GET LISTING ERROR:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -20,6 +20,7 @@ export default function AdsDashboard() {
   const [editingAd, setEditingAd] = useState<Ad | null>(null);
   const [loading, setLoading] = useState(false);
   const [ads, setAds] = useState<Ad[]>([]);
+  const [showForm, setShowForm] = useState(true);
 
   
 
@@ -33,6 +34,16 @@ export default function AdsDashboard() {
   };
 
   const [form, setForm] = useState<Ad>(emptyForm);
+  const currentAd = ads.find(ad => ad.type === activeTab);
+useEffect(() => {
+  if (currentAd && !editingAd) {
+    setShowForm(false); // ad exists → hide create form
+  } else {
+    setShowForm(true);
+  }
+}, [currentAd, editingAd]);
+
+
 
   /* =========================
      READ WALLET FROM STORAGE
@@ -71,7 +82,9 @@ export default function AdsDashboard() {
     setEditingAd(ad);
     setForm(ad);
     setActiveTab(ad.type);
+    setShowForm(true);
   };
+ 
 
   /* =========================
      PAYMENT METHODS
@@ -137,15 +150,15 @@ export default function AdsDashboard() {
       alert(isEdit ? "Ad updated successfully" : "Ad created successfully");
       const savedAd = data.listing;
 
-      setAds(prev => {
-        const filtered = prev.filter(a => a.id !== savedAd.id);
-        return [...filtered, savedAd];
-      });
+      setAds(prev =>
+  prev.map(ad => (ad.id === savedAd.id ? savedAd : ad))
+);
 
 
       // reset state
       setEditingAd(null);
       setForm({ ...emptyForm, type: activeTab });
+      setShowForm(false);
 
     } catch (err) {
       console.error(err);
@@ -217,7 +230,8 @@ export default function AdsDashboard() {
 
 
       {/* FORM */}
-      <div className="space-y-3 bg-zinc-900 p-4 rounded-xl">
+      {showForm && (
+  <div className="space-y-3 bg-zinc-900 p-4 rounded-xl">
 
         <input
           type="number"
@@ -287,7 +301,7 @@ export default function AdsDashboard() {
               ? "Update Ad"
               : `Create ${activeTab} Ad`}
         </button>
-      </div>
+      </div>)}
     </div>
   );
 }
