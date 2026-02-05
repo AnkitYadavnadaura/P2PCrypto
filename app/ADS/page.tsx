@@ -35,13 +35,7 @@ export default function AdsDashboard() {
 
   const [form, setForm] = useState<Ad>(emptyForm);
   const currentAd = ads.find(ad => ad.type === activeTab);
-useEffect(() => {
-  if (currentAd && !editingAd) {
-    setShowForm(false); // ad exists → hide create form
-  } else {
-    setShowForm(true);
-  }
-}, [currentAd, editingAd]);
+
 
 
 
@@ -73,6 +67,7 @@ useEffect(() => {
     setActiveTab(tab);
     setEditingAd(null);
     setForm({ ...emptyForm, type: tab });
+    setShowForm(!ads.find(a => a.type === tab));
   };
 
   /* =========================
