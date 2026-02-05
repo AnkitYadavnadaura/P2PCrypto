@@ -40,6 +40,7 @@ export async function POST(req: Request) {
     return Response.json({
     success: true,
     redirect: "/dashboard",
+    address : walletAddress,
   });
   } catch (err) {
     console.error(err);
