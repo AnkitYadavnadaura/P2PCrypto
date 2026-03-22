@@ -107,22 +107,28 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const wallet = searchParams.get("wallet");
-
-    if (!wallet) {
-      return NextResponse.json(
-        { error: "Wallet address required" },
-        { status: 400 }
-      );
+    let listings;
+    if (wallet) {
+      listings = await prisma.listing.findMany({
+        where: {
+          userId: wallet,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+    } 
+    // 🔹 CASE 2: ALL PUBLIC ADS (marketplace)
+    else {
+      listings = await prisma.listing.findMany({
+        where: {
+          status: "ACTIVE", // only active ads
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
     }
-
-    const listings = await prisma.listing.findMany({
-      where: {
-        userId: wallet,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
 
     return NextResponse.json({ listings });
   } catch (error) {
