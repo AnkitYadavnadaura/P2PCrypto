@@ -313,6 +313,7 @@ type MarketUser = {
   name: string;
   price: string;
   limit: string;
+  methods?: string[]; 
 };
 
 type MarketListProps = {
