@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 
+
 type AdType = "BUY" | "SELL";
 
 interface Ad {
   id?: string;
   type: AdType;
   price: string;
-  paymentMethods: string[];
+  paymentMethods: any[]
   maxTime: string;
   maxAmount: string;
   balance: number;
@@ -21,6 +22,7 @@ export default function AdsDashboard() {
   const [loading, setLoading] = useState(false);
   const [ads, setAds] = useState<Ad[]>([]);
   const [showForm, setShowForm] = useState(true);
+  const [userPaymentMethods, setUserPaymentMethods] = useState<any[]>([]);
 
   
 
@@ -42,6 +44,13 @@ export default function AdsDashboard() {
   /* =========================
      READ WALLET FROM STORAGE
      ========================= */
+  useEffect(() => {
+  const stored = localStorage.getItem("paymentMethods");
+  if (stored) {
+    setUserPaymentMethods(JSON.parse(stored));
+  }
+}, []);
+  
   useEffect(() => {
     const stored = localStorage.getItem("WalletAd");
     if (stored) {
@@ -85,14 +94,20 @@ export default function AdsDashboard() {
   /* =========================
      PAYMENT METHODS
      ========================= */
-  const togglePaymentMethod = (method: string) => {
-    setForm(prev => ({
+  const togglePaymentMethod = (method: any) => {
+  setForm(prev => {
+    const exists = prev.paymentMethods.find(
+      (m: any) => m.id === method.id
+    );
+
+    return {
       ...prev,
-      paymentMethods: prev.paymentMethods.includes(method)
-        ? prev.paymentMethods.filter(m => m !== method)
+      paymentMethods: exists
+        ? prev.paymentMethods.filter((m: any) => m.id !== method.id)
         : [...prev.paymentMethods, method],
-    }));
-  };
+    };
+  });
+};
 
   /* =========================
      SUBMIT (CREATE / UPDATE)
@@ -149,7 +164,11 @@ export default function AdsDashboard() {
       const savedAd = data.listing;
 
       setAds(prev =>
-  prev.map(ad => (ad.id === savedAd.id ? savedAd : ad))
+  const exists = prev.find(ad => ad.id === savedAd.id);
+  if (exists) {
+    return prev.map(ad => ad.id === savedAd.id ? savedAd : ad);
+  }
+  return [...prev, savedAd];
 );
 
 
