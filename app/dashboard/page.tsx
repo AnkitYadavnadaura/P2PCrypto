@@ -52,6 +52,17 @@ useEffect(() => {
 useEffect(() => {
   localStorage.setItem("paymentMethods", JSON.stringify(paymentMethods));
 }, [paymentMethods]);
+  const [selectedAd, setSelectedAd] = useState(null);
+const [showTradeModal, setShowTradeModal] = useState(false);
+
+  //handle trade
+  const handleTrade = (ad: any) => {
+  console.log("Selected Ad:", ad);
+  setSelectedAd(ad);
+  setShowTradeModal(true);
+
+  // next step me modal open karenge
+};
 
 
 
@@ -96,6 +107,7 @@ useEffect(() => {
 
             {marketTab === "buy" && (
               <MarketList
+                onTrade={(ad) => handleTrade(ad)}
                 type="Buy"
                 color="yellow"
                 users={filteredAds.map(ad => ({
@@ -109,6 +121,7 @@ useEffect(() => {
 
             {marketTab === "sell" && (
               <MarketList
+                onTrade={(ad) => handleTrade(ad)}
                 type="Sell"
                 color="green"
                 users={filteredAds.map(ad => ({
@@ -172,6 +185,13 @@ useEffect(() => {
             <Order id="12346" status="Pending" type="Sell" amount="₹5,000" />
           </section>
         )}
+        {/*trade modal show*/}
+        {showTradeModal && selectedAd && (
+  <TradeModal
+    ad={selectedAd}
+    onClose={() => setShowTradeModal(false)}
+  />
+)}
 
         {/* Profile */}
         {section === "profile" && (
@@ -320,6 +340,7 @@ type MarketListProps = {
   users: MarketUser[];
   type: "Buy" | "Sell";
   color: "yellow" | "green";
+  onTrade: (user: MarketUser) => void;
 };
 const MarketList: React.FC<MarketListProps> = ({
   users,
@@ -348,7 +369,8 @@ const MarketList: React.FC<MarketListProps> = ({
 </p>
           </div>
 
-          <button
+          <button  
+            onClick={() => onTrade(u)}
             className={`${buttonColorMap[color]} text-black px-4 py-1 rounded-lg font-bold`}
           >
             {type}
@@ -663,6 +685,81 @@ const UPIForm: React.FC<UPIFormProps> = ({ onSave, method }) => {
         {method ? "Update UPI Method" : "Save UPI Method"}
       </button>
     </>
+  );
+};
+
+const TradeModal = ({ ad, onClose }: any) => {
+  const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("");
+
+  const submitOrder = async () => {
+    const wallet = localStorage.getItem("WalletAd");
+
+    const res = await fetch("/api/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        adId: ad.id,
+        amount,
+        paymentMethod: method,
+        walletAddress: wallet
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    alert("Order Created ✅");
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
+      <div className="bg-gray-900 p-5 rounded-xl w-full max-w-sm space-y-3">
+
+        <h2 className="font-semibold text-lg">Create Trade</h2>
+
+        <p className="text-sm">Price: ₹{ad.price}</p>
+
+        <input
+          placeholder="Enter Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="w-full p-3 bg-black rounded"
+        />
+
+        <select
+          value={method}
+          onChange={(e) => setMethod(e.target.value)}
+          className="w-full p-3 bg-black rounded"
+        >
+          <option value="">Select Payment</option>
+          {ad.methods?.map((m: any, i: number) => (
+            <option key={i} value={m}>
+              {m}
+            </option>
+          ))}
+        </select>
+
+        <button
+          onClick={submitOrder}
+          className="w-full bg-green-500 text-black py-3 rounded-xl"
+        >
+          Confirm Trade
+        </button>
+
+        <button onClick={onClose} className="text-sm text-gray-400">
+          Cancel
+        </button>
+
+      </div>
+    </div>
   );
 };
 
