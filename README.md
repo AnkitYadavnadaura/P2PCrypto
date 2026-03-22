@@ -1,4 +1,4 @@
-# P2P MiniApp — Next.js (Vercel) Template
+# P2P MiniApp 
 
 This is a backendless Next.js (App Router) starter for a P2P crypto marketplace:
 - Serverless API routes in `app/api/.../route.ts`
