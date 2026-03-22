@@ -346,6 +346,7 @@ const MarketList: React.FC<MarketListProps> = ({
   users,
   type,
   color,
+  onTrade,
 }) => {
   const buttonColorMap: Record<MarketListProps["color"], string> = {
     yellow: "bg-yellow-400",
