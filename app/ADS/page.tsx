@@ -163,13 +163,13 @@ export default function AdsDashboard() {
       alert(isEdit ? "Ad updated successfully" : "Ad created successfully");
       const savedAd = data.listing;
 
-      setAds(prev =>
+      setAds(prev =>{
   const exists = prev.find(ad => ad.id === savedAd.id);
   if (exists) {
     return prev.map(ad => ad.id === savedAd.id ? savedAd : ad);
   }
   return [...prev, savedAd];
-);
+      });
 
 
       // reset state
