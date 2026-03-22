@@ -9,6 +9,7 @@ export default function Dashboard() {
   const [showAddMethod, setShowAddMethod] = useState(false);
 const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
 const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [marketAds, setMarketAds] = useState<any[]>([]);
 const handleSaveMethod = (method: PaymentMethod) => {
   setPaymentMethods((prev) => {
     // EDIT mode
@@ -33,6 +34,19 @@ useEffect(() => {
     setPaymentMethods(JSON.parse(stored));
   }
 }, []);
+  //fetch ads
+  useEffect(() => {
+  fetch("/api/listing") // all public ads
+    .then(res => res.json())
+    .then(data => {
+      setMarketAds(data.listings || []);
+    })
+    .catch(err => console.error(err));
+}, []);
+
+  const filteredAds = marketAds.filter(
+  ad => ad.type === (marketTab === "buy" ? "SELL" : "BUY")
+);
 
 // Save
 useEffect(() => {
@@ -84,10 +98,12 @@ useEffect(() => {
               <MarketList
                 type="Buy"
                 color="yellow"
-                users={[
-                  { name: "User123", price: "₹84.5", limit: "₹500 - ₹50,000" },
-                  { name: "CryptoKing", price: "₹84.4", limit: "₹1,000 - ₹100,000" }
-                ]}
+                users={filteredAds.map(ad => ({
+  name: ad.userId?.slice(0, 6) + "...",
+  price: `₹${ad.price}`,
+  limit: `₹${ad.minAmount} - ₹${ad.maxAmount}`,
+  methods: ad.paymentMethods 
+}))}
               />
             )}
 
@@ -95,10 +111,12 @@ useEffect(() => {
               <MarketList
                 type="Sell"
                 color="green"
-                users={[
-                  { name: "TraderPro", price: "₹84.8", limit: "₹1,000 - ₹75,000" },
-                  { name: "CoinGuru", price: "₹84.9", limit: "₹500 - ₹25,000" }
-                ]}
+                users={filteredAds.map(ad => ({
+  name: ad.userId?.slice(0, 6) + "...",
+  price: `₹${ad.price}`,
+  limit: `₹${ad.minAmount} - ₹${ad.maxAmount}`,
+  methods: ad.paymentMethods 
+}))}
               />
             )}
           </section>
@@ -324,6 +342,9 @@ const MarketList: React.FC<MarketListProps> = ({
             <p className="text-xs text-gray-400">
               Price: {u.price} | Limit: {u.limit}
             </p>
+            <p className="text-xs text-gray-400">
+  {u.methods?.join(", ")}
+</p>
           </div>
 
           <button
