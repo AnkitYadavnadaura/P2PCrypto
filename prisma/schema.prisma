@@ -48,7 +48,7 @@ model Listing {
   balance         Decimal
 
   /// Payment & timing
-  paymentMethods  String[]      // ["UPI", "IMPS", "BANK"]
+  paymentMethods  Json      // ["UPI", "IMPS", "BANK"]
   maxTimeMinutes  Int           // order completion time
   status          ListingStatus @default(ACTIVE)
   createdAt       DateTime      @default(now())
