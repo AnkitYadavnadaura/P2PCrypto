@@ -12,6 +12,7 @@ export async function PATCH(
     const body = await req.json();
 
     const {
+      Id1,
       walletAddress,
       price,
       minAmount,
