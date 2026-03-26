@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { createBuyListing, createSellListing } from "@/lib/contract";
+import { createBuyListing, createSellListing } from "../lib/contract";
 
 
 type AdType = "BUY" | "SELL";
