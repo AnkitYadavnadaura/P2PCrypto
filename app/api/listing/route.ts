@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const {
+      Id1,
       walletAddress,
       type,
       cryptoSymbol,
@@ -79,6 +80,7 @@ export async function POST(req: NextRequest) {
        ========================= */
     const listing = await prisma.listing.create({
       data: {
+        id:Id1,
         userId: walletAddress, // wallet = user identity
         type,
         cryptoSymbol,
