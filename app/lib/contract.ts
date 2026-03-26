@@ -69,3 +69,14 @@ export const markPaid = async (listingId: number) => {
 export const release = async (listingId: number) => {
   await sendTx(contractAddress, encode("release", [listingId]));
 };
+
+export const getListingCount = async () => {
+  const res = await MiniKit.readContract({
+    address: contractAddress,
+    abi: ABI,
+    functionName: "listingCount",
+    args: [],
+  });
+
+  return Number(res);
+};
