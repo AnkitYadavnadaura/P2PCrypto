@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { createBuyListing, createSellListing } from "../lib/contract";
+import { createBuyListing, createSellListing, getListingCount } from "../lib/contract";
 
 
 type AdType = "BUY" | "SELL";
@@ -126,7 +126,9 @@ export default function AdsDashboard() {
     if(form.maxTime == undefined){
       form.maxTime = "15 mins"
     }
+    let Id1 = await  getListingCount();
     const payload = {
+      Id1,
       walletAddress,
       type: form.type,
       cryptoSymbol: "USDT",
