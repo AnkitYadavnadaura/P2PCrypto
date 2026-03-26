@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { MiniKit, WalletAuthInput } from '@worldcoin/minikit-js'
+import {
+  joinSellAd,
+  joinBuyAd,
+  markPaid,
+  release
+} from "../lib/contract";
 import { PaymentMethod , PaymentMethodType , BankMethod,UPIMethod,BinanceMethod } from "../types/payment";
 export default function Dashboard() {
   const [section, setSection] = useState("home");
@@ -376,6 +382,7 @@ const MarketList: React.FC<MarketListProps> = ({
           >
             {type}
           </button>
+          
         </div>
       ))}
     </div>
@@ -747,13 +754,18 @@ const TradeModal = ({ ad, onClose }: any) => {
             </option>
           ))}
         </select>
-
         <button
-          onClick={submitOrder}
-          className="w-full bg-green-500 text-black py-3 rounded-xl"
-        >
-          Confirm Trade
-        </button>
+  onClick={() => {
+    if (type === "Buy") {
+      joinSellAd(u.id);
+    } else {
+      joinBuyAd(u.id, "1"); // temp amount
+    }
+  }}
+  className={`w-full bg-green-500 text-black py-3 rounded-xl`}
+>
+  {type}
+</button>
 
         <button onClick={onClose} className="text-sm text-gray-400">
           Cancel
