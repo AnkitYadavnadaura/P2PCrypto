@@ -126,7 +126,7 @@ export default function AdsDashboard() {
     if(form.maxTime == undefined){
       form.maxTime = "15 mins"
     }
-    let Id1 = await  getListingCount();
+    let Id1 = await  getListingCount() +1;
     const payload = {
       Id1,
       walletAddress,
