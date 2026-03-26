@@ -10,4 +10,5 @@ export const ABI = [
 
   // ⭐ OPTIONAL (future use)
   "function listings(uint256 id) view returns (uint256 id, address seller, address buyer, uint256 amount, uint8 status, uint8 listingType)"
+  "function approve(address spender, uint256 amount)"
 ];
