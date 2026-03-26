@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { createBuyListing, createSellListing } from "@/lib/contract";
 
 
 type AdType = "BUY" | "SELL";
@@ -159,6 +160,11 @@ export default function AdsDashboard() {
         alert(data.error || "Request failed");
         return;
       }
+      if (form.type === "SELL") {
+  await createSellListing(form.maxAmount);
+} else {
+  await createBuyListing(form.maxAmount);
+}
 
       alert(isEdit ? "Ad updated successfully" : "Ad created successfully");
       const savedAd = data.listing;
