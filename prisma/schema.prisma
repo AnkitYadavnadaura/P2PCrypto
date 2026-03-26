@@ -28,8 +28,7 @@ enum ListingStatus {
 
 
 model Listing {
-  id              String        @id @default(uuid())
-  contractListingId Int?
+  id              int?
 
   /// Who created the ad
   userId          String
