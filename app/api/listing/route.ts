@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Prisma } from "@prisma/client";
+import { prisma } from "../../../lib/prisma";
+import { requireWalletAuth } from "../../lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
       paymentMethods,
       maxTimeMinutes,
     } = body;
+
+    const auth = await requireWalletAuth(walletAddress);
+    if (!auth.ok) return auth.response;
 
     /* =========================
        BASIC VALIDATION
@@ -75,6 +78,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (type === "SELL" && Number(balance) < Number(maxAmount)) {
+      return NextResponse.json(
+        { error: "SELL listing requires escrow-ready balance >= maxAmount" },
+        { status: 400 }
+      );
+    }
+
     /* =========================
        CREATE LISTING
        ========================= */
@@ -119,7 +129,7 @@ export async function GET(request: Request) {
           createdAt: "desc",
         },
       });
-    } 
+    }
     // 🔹 CASE 2: ALL PUBLIC ADS (marketplace)
     else {
       listings = await prisma.listing.findMany({

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
-import { ethers } from "ethers";
 import { cookies } from "next/headers";
 import {
   MiniAppWalletAuthSuccessPayload,
@@ -17,10 +16,13 @@ export async function POST(req: Request) {
     // const body = await req.json();
     const { payload, nonce } = (await req.json()) as IRequestPayload;
     const validMessage = await verifySiweMessage(payload, nonce);
+    if (!validMessage.isValid) {
+      return NextResponse.json({ success: false, error: "Invalid wallet signature" }, { status: 401 });
+    }
     // Save or find user in database (pseudo code)
     // const user = await db.user.upsert({ where: { wallet: walletAddress }, create: { wallet: walletAddress } });
     const walletAddress = payload.address
-    const user = await prisma.user.upsert({
+    await prisma.user.upsert({
       where: { walletAddress },
       update: { createdAt: new Date() },
       create: {
