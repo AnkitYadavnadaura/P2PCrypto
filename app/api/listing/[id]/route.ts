@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Prisma } from "@prisma/client";
+import { prisma } from "../../../../lib/prisma";
+import { requireWalletAuth } from "../../../lib/auth";
 
 export async function PATCH(
   req: NextRequest,
@@ -12,7 +12,6 @@ export async function PATCH(
     const body = await req.json();
 
     const {
-      Id1,
       walletAddress,
       price,
       minAmount,
@@ -22,6 +21,9 @@ export async function PATCH(
       maxTimeMinutes,
       status,
     } = body;
+
+    const auth = await requireWalletAuth(walletAddress);
+    if (!auth.ok) return auth.response;
 
     /* =========================
        AUTHORIZATION CHECK
@@ -51,6 +53,14 @@ export async function PATCH(
       if (Number(balance) < Number(listing.minAmount)) {
         return NextResponse.json(
           { error: "Balance too low" },
+          { status: 400 }
+        );
+      }
+
+      const effectiveMaxAmount = maxAmount ?? listing.maxAmount;
+      if (Number(balance) < Number(effectiveMaxAmount)) {
+        return NextResponse.json(
+          { error: "SELL listing requires escrow-ready balance >= maxAmount" },
           { status: 400 }
         );
       }

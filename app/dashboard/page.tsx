@@ -9,8 +9,8 @@ import {
   release
 } from "../lib/contract";
 import { PaymentMethod , PaymentMethodType , BankMethod,UPIMethod,BinanceMethod } from "../types/payment";
-const [marketTab, setMarketTab] = useState("buy");
 export default function Dashboard() {
+  const [marketTab, setMarketTab] = useState("buy");
   const [section, setSection] = useState("home");
   
   const [showAddMethod, setShowAddMethod] = useState(false);
@@ -196,6 +196,7 @@ const [showTradeModal, setShowTradeModal] = useState(false);
         {showTradeModal && selectedAd && (
   <TradeModal
     ad={selectedAd}
+    marketTab={marketTab}
     onClose={() => setShowTradeModal(false)}
   />
 )}
@@ -697,14 +698,14 @@ const UPIForm: React.FC<UPIFormProps> = ({ onSave, method }) => {
   );
 };
 
-const TradeModal = ({ ad, onClose }: any) => {
+const TradeModal = ({ ad, marketTab, onClose }: any) => {
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("");
 
   const submitOrder = async () => {
     const wallet = localStorage.getItem("WalletAd");
 
-    const res = await fetch("/api/order", {
+    const res = await fetch("/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -757,10 +758,16 @@ const TradeModal = ({ ad, onClose }: any) => {
         </select>
         <button
   onClick={() => {
-    if (marketTab === "Buy") {
-      joinSellAd(u.id);
+    const listingId = Number(ad.contractListingId ?? 0);
+    if (!listingId) {
+      alert("Invalid contract listing id");
+      return;
+    }
+
+    if (marketTab === "buy") {
+      joinSellAd(listingId, amount || "1");
     } else {
-      joinBuyAd(u.id, "1"); // temp amount
+      joinBuyAd(listingId, amount || "1");
     }
   }}
   className={`w-full bg-green-500 text-black py-3 rounded-xl`}
