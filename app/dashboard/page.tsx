@@ -756,7 +756,7 @@ const TradeModal = ({ ad, onClose }: any) => {
         </select>
         <button
   onClick={() => {
-    if (type === "Buy") {
+    if (marketTab === "Buy") {
       joinSellAd(u.id);
     } else {
       joinBuyAd(u.id, "1"); // temp amount
@@ -764,7 +764,7 @@ const TradeModal = ({ ad, onClose }: any) => {
   }}
   className={`w-full bg-green-500 text-black py-3 rounded-xl`}
 >
-  {type}
+  {marketTab}
 </button>
 
         <button onClick={onClose} className="text-sm text-gray-400">
