@@ -2,8 +2,8 @@ import { MiniKit } from "@worldcoin/minikit-js";
 import { ethers } from "ethers";
 import { ABI } from "./abi";
 
-const contractAddress = "YOUR_CONTRACT_ADDRESS";
-const tokenAddress = "YOUR_TOKEN_ADDRESS";
+const contractAddress = "0xb9650bc41b87dc0e6264fb47eacb78dd881dacbc";
+const tokenAddress = "0x2cFc85d8E48F8EAB294be644d9E25C3030863003";
 
 const iface = new ethers.Interface(ABI);
 
