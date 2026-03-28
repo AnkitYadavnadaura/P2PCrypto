@@ -9,8 +9,8 @@ import {
   release
 } from "../lib/contract";
 import { PaymentMethod , PaymentMethodType , BankMethod,UPIMethod,BinanceMethod } from "../types/payment";
-const [marketTab, setMarketTab] = useState("buy");
 export default function Dashboard() {
+  const [marketTab, setMarketTab] = useState("buy");
   const [section, setSection] = useState("home");
   
   const [showAddMethod, setShowAddMethod] = useState(false);
@@ -196,6 +196,7 @@ const [showTradeModal, setShowTradeModal] = useState(false);
         {showTradeModal && selectedAd && (
   <TradeModal
     ad={selectedAd}
+    marketTab={marketTab}
     onClose={() => setShowTradeModal(false)}
   />
 )}
@@ -697,7 +698,7 @@ const UPIForm: React.FC<UPIFormProps> = ({ onSave, method }) => {
   );
 };
 
-const TradeModal = ({ ad, onClose }: any) => {
+const TradeModal = ({ ad, marketTab, onClose }: any) => {
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("");
 
@@ -763,7 +764,7 @@ const TradeModal = ({ ad, onClose }: any) => {
       return;
     }
 
-    if (marketTab === "Buy") {
+    if (marketTab === "buy") {
       joinSellAd(listingId);
     } else {
       joinBuyAd(listingId, "1"); // temp amount
