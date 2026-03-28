@@ -16,7 +16,7 @@ Status: **NOT READY FOR PRODUCTION**
 - [x] Basic idempotency keys on order/payment/listing actions (in-memory, phase-2).
 - [x] Basic rate limiting + abuse controls (in-memory, phase-2).
 - [ ] Durable background workers for retries/webhooks.
-- [ ] Contract event indexer (on-chain to DB reconciliation).
+- [x] Basic contract event reconciliation endpoint (`POST /api/reconcile`) with secret auth (phase-3 scaffold).
 
 ## Security/Compliance
 - [ ] KYC/KYB provider integration.
