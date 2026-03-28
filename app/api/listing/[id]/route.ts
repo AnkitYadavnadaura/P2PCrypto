@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../../lib/prisma";
 import { requireWalletAuth } from "../../../lib/auth";
+import { checkRateLimit } from "../../../lib/rate-limit";
 
 export async function PATCH(
   req: NextRequest,
@@ -24,6 +25,9 @@ export async function PATCH(
 
     const auth = await requireWalletAuth(walletAddress);
     if (!auth.ok) return auth.response;
+
+    const rl = checkRateLimit(`listing:patch:${auth.wallet}`, 40, 60_000);
+    if (!rl.ok) return rl.response;
 
     /* =========================
        AUTHORIZATION CHECK

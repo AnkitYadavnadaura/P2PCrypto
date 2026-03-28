@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import { requireWalletAuth } from "../../lib/auth";
+import { checkRateLimit } from "../../lib/rate-limit";
+import { getIdempotencyResponse, setIdempotencyResponse } from "../../lib/idempotency";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +24,15 @@ export async function POST(req: NextRequest) {
 
     const auth = await requireWalletAuth(walletAddress);
     if (!auth.ok) return auth.response;
+
+    const rl = checkRateLimit(`listing:post:${auth.wallet}`, 30, 60_000);
+    if (!rl.ok) return rl.response;
+
+    const idemKey = (req.headers.get("x-idempotency-key") || "").trim();
+    if (idemKey) {
+      const cached = getIdempotencyResponse(`listing:post:${auth.wallet}:${idemKey}`);
+      if (cached) return cached;
+    }
 
     /* =========================
        BASIC VALIDATION
@@ -104,7 +115,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ listing }, { status: 201 });
+    const payload = { listing };
+    if (idemKey) {
+      setIdempotencyResponse(`listing:post:${auth.wallet}:${idemKey}`, payload, { status: 201 });
+    }
+
+    return NextResponse.json(payload, { status: 201 });
 
   } catch (err) {
     console.error("CREATE LISTING ERROR:", err);

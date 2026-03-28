@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
-const store = new Map<string, { expiresAt: number; payload: unknown }>();
+type CachedResponse = {
+  expiresAt: number;
+  payload: unknown;
+  status: number;
+};
+
+const store = new Map<string, CachedResponse>();
 
 export function getIdempotencyResponse(key: string) {
   const hit = store.get(key);
@@ -9,9 +15,20 @@ export function getIdempotencyResponse(key: string) {
     store.delete(key);
     return null;
   }
-  return NextResponse.json(hit.payload);
+  return NextResponse.json(hit.payload, { status: hit.status });
 }
 
-export function setIdempotencyResponse(key: string, payload: unknown, ttlMs = 60_000) {
-  store.set(key, { expiresAt: Date.now() + ttlMs, payload });
+export function setIdempotencyResponse(
+  key: string,
+  payload: unknown,
+  options?: { ttlMs?: number; status?: number },
+) {
+  const ttlMs = options?.ttlMs ?? 60_000;
+  const status = options?.status ?? 200;
+
+  store.set(key, {
+    expiresAt: Date.now() + ttlMs,
+    payload,
+    status,
+  });
 }

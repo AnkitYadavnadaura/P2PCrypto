@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
   const payload = order;
   if (idemKey) {
-    setIdempotencyResponse(`orders:post:${auth.wallet}:${idemKey}`, payload);
+    setIdempotencyResponse(`orders:post:${auth.wallet}:${idemKey}`, payload, { status: 201 });
   }
 
   return NextResponse.json(payload, { status: 201 });

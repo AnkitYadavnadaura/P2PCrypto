@@ -11,6 +11,13 @@ export function checkRateLimit(key: string, limit: number, windowMs: number) {
   const now = Date.now();
   const current = buckets.get(key);
 
+  // opportunistic cleanup to avoid unbounded growth
+  if (buckets.size > 10_000) {
+    for (const [k, v] of buckets.entries()) {
+      if (v.resetAt <= now) buckets.delete(k);
+    }
+  }
+
   if (!current || current.resetAt <= now) {
     buckets.set(key, { count: 1, resetAt: now + windowMs });
     return { ok: true as const };
