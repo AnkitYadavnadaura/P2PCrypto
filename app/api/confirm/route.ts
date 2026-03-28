@@ -2,6 +2,8 @@ import { prisma } from '../../../lib/prisma';
 import { NextResponse } from 'next/server';
 import { requireWalletAuth } from '../../lib/auth';
 import { ORDER_STATUS, canTransitionStatus } from '../../lib/order-state';
+import { checkRateLimit } from '../../lib/rate-limit';
+import { getIdempotencyResponse, setIdempotencyResponse } from '../../lib/idempotency';
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +11,15 @@ export async function POST(req: Request) {
 
     const auth = await requireWalletAuth(walletAddress);
     if (!auth.ok) return auth.response;
+
+    const rl = checkRateLimit(`confirm:post:${auth.wallet}`, 20, 60_000);
+    if (!rl.ok) return rl.response;
+
+    const idemKey = (req.headers.get('x-idempotency-key') || '').trim();
+    if (idemKey) {
+      const cached = getIdempotencyResponse(`confirm:post:${auth.wallet}:${idemKey}`);
+      if (cached) return cached;
+    }
 
     if (!order_id) {
       return NextResponse.json({ error: 'order_id is required' }, { status: 400 });
@@ -55,7 +66,12 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    return NextResponse.json({ ok: true, tx: '0xFAKE_TX_FOR_DEV' });
+    const payload = { ok: true, tx: '0xFAKE_TX_FOR_DEV' };
+    if (idemKey) {
+      setIdempotencyResponse(`confirm:post:${auth.wallet}:${idemKey}`, payload);
+    }
+
+    return NextResponse.json(payload);
   } catch (err) {
     console.error('Error in confirm API:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

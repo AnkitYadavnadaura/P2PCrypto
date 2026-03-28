@@ -13,8 +13,8 @@ Status: **NOT READY FOR PRODUCTION**
 ## Backend/APIs
 - [x] Wallet-cookie auth guard on write routes.
 - [x] Order status transition validation.
-- [ ] Idempotency keys on order/payment actions.
-- [ ] Rate limiting + abuse controls.
+- [x] Basic idempotency keys on order/payment actions (in-memory, phase-2).
+- [x] Basic rate limiting + abuse controls (in-memory, phase-2).
 - [ ] Durable background workers for retries/webhooks.
 - [ ] Contract event indexer (on-chain to DB reconciliation).
 

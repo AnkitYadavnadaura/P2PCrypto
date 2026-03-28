@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import Pusher from 'pusher';
 import { requireWalletAuth } from '../../lib/auth';
+import { checkRateLimit } from '../../lib/rate-limit';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -17,6 +18,9 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const auth = await requireWalletAuth(body.walletAddress);
   if (!auth.ok) return auth.response;
+
+  const rl = checkRateLimit(`events:post:${auth.wallet}`, 60, 60_000);
+  if (!rl.ok) return rl.response;
 
   await pool.query('INSERT INTO events(type, payload, created_at) VALUES ($1,$2,now())', [
     body.type,

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { requireWalletAuth } from '../../lib/auth';
 import { ORDER_STATUS, OrderStatus, canTransitionStatus } from '../../lib/order-state';
+import { checkRateLimit } from '../../lib/rate-limit';
+import { getIdempotencyResponse, setIdempotencyResponse } from '../../lib/idempotency';
 
 export async function GET() {
   const rows = await prisma.order.findMany({
@@ -26,6 +28,15 @@ export async function POST(req: NextRequest) {
 
   const auth = await requireWalletAuth(walletAddress);
   if (!auth.ok) return auth.response;
+
+  const rl = checkRateLimit(`orders:post:${auth.wallet}`, 20, 60_000);
+  if (!rl.ok) return rl.response;
+
+  const idemKey = req.headers.get('x-idempotency-key');
+  if (idemKey) {
+    const cached = getIdempotencyResponse(`orders:post:${auth.wallet}:${idemKey}`);
+    if (cached) return cached;
+  }
 
   let effectiveListingId = listingId as string | undefined;
 
@@ -85,7 +96,12 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return NextResponse.json(order, { status: 201 });
+  const payload = order;
+  if (idemKey) {
+    setIdempotencyResponse(`orders:post:${auth.wallet}:${idemKey}`, payload);
+  }
+
+  return NextResponse.json(payload, { status: 201 });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -94,6 +110,9 @@ export async function PATCH(req: NextRequest) {
 
   const auth = await requireWalletAuth(walletAddress);
   if (!auth.ok) return auth.response;
+
+  const rl = checkRateLimit(`orders:patch:${auth.wallet}`, 40, 60_000);
+  if (!rl.ok) return rl.response;
 
   if (!orderId || !nextStatus) {
     return NextResponse.json({ error: 'orderId and nextStatus are required' }, { status: 400 });
