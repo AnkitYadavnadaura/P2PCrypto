@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const walletAddress = payload.address
     await prisma.user.upsert({
       where: { walletAddress },
-      update: { createdAt: new Date() },
+      update: {},
       create: {
         walletAddress,
         email: null,
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     const cookieStore = await cookies();
      cookieStore.set("wallet", payload.address, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
   });

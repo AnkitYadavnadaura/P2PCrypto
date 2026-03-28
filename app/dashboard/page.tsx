@@ -757,10 +757,16 @@ const TradeModal = ({ ad, onClose }: any) => {
         </select>
         <button
   onClick={() => {
+    const listingId = Number(ad.contractListingId ?? 0);
+    if (!listingId) {
+      alert("Invalid contract listing id");
+      return;
+    }
+
     if (marketTab === "Buy") {
-      joinSellAd(u.id);
+      joinSellAd(listingId);
     } else {
-      joinBuyAd(u.id, "1"); // temp amount
+      joinBuyAd(listingId, "1"); // temp amount
     }
   }}
   className={`w-full bg-green-500 text-black py-3 rounded-xl`}
