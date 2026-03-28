@@ -9,9 +9,10 @@ import {
   release
 } from "../lib/contract";
 import { PaymentMethod , PaymentMethodType , BankMethod,UPIMethod,BinanceMethod } from "../types/payment";
+const [marketTab, setMarketTab] = useState("buy");
 export default function Dashboard() {
   const [section, setSection] = useState("home");
-  const [marketTab, setMarketTab] = useState("buy");
+  
   const [showAddMethod, setShowAddMethod] = useState(false);
 const [editingMethod, setEditingMethod] = useState<PaymentMethod | null>(null);
 const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
