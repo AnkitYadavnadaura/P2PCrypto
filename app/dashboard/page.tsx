@@ -705,7 +705,7 @@ const TradeModal = ({ ad, marketTab, onClose }: any) => {
   const submitOrder = async () => {
     const wallet = localStorage.getItem("WalletAd");
 
-    const res = await fetch("/api/order", {
+    const res = await fetch("/api/orders", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

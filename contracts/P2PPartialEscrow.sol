@@ -187,7 +187,15 @@ contract P2PPartialEscrow {
         Order storage o = orders[orderId];
         require(o.id != 0, "order missing");
         require(o.status == OrderStatus.CREATED, "invalid status");
-        require(msg.sender == o.taker, "only taker");
+
+        Listing storage l = listings[o.listingId];
+        // SELL listing: taker has paid maker in fiat.
+        // BUY listing: maker has paid taker in fiat.
+        if (l.listingType == ListingType.SELL) {
+            require(msg.sender == o.taker, "only taker for SELL");
+        } else {
+            require(msg.sender == o.maker, "only maker for BUY");
+        }
 
         o.status = OrderStatus.PAID;
         emit OrderPaid(orderId);
@@ -197,10 +205,20 @@ contract P2PPartialEscrow {
         Order storage o = orders[orderId];
         require(o.id != 0, "order missing");
         require(o.status == OrderStatus.PAID, "not paid");
-        require(msg.sender == o.maker, "only maker");
+
+        Listing storage l = listings[o.listingId];
+
+        // SELL listing: maker releases escrowed maker tokens to taker.
+        // BUY listing: taker releases escrowed taker tokens to maker.
+        if (l.listingType == ListingType.SELL) {
+            require(msg.sender == o.maker, "only maker for SELL");
+            require(token.transfer(o.taker, o.amount), "release fail");
+        } else {
+            require(msg.sender == o.taker, "only taker for BUY");
+            require(token.transfer(o.maker, o.amount), "release fail");
+        }
 
         o.status = OrderStatus.RELEASED;
-        require(token.transfer(o.taker, o.amount), "release fail");
         emit OrderReleased(orderId);
     }
 
