@@ -8,10 +8,7 @@ interface IERC20 {
 
 /**
  * @title P2PPartialEscrow
- * @notice Minimal Binance-style P2P core for partial fills:
- *         - Makers create BUY/SELL listings with min/max per order
- *         - Takers can partially fill remaining amount
- *         - Fiat off-chain confirmation via markPaid/release lifecycle
+ * @notice Minimal Binance-style P2P core for partial fills with dispute + timeout hooks.
  */
 contract P2PPartialEscrow {
     enum ListingType {
@@ -40,7 +37,7 @@ contract P2PPartialEscrow {
         ListingType listingType;
         uint256 totalAmount;
         uint256 remainingAmount;
-        uint256 price;      // fiat price per token unit (off-chain reference)
+        uint256 price;
         uint256 minTrade;
         uint256 maxTrade;
         ListingStatus status;
@@ -54,12 +51,16 @@ contract P2PPartialEscrow {
         uint256 amount;
         uint256 price;
         OrderStatus status;
+        uint256 createdAt;
+        uint256 paidAt;
     }
 
     IERC20 public immutable token;
+    address public admin;
 
     uint256 public listingCount;
     uint256 public orderCount;
+    uint256 public orderTimeoutSeconds = 30 minutes;
 
     mapping(uint256 => Listing) public listings;
     mapping(uint256 => Order) public orders;
@@ -73,7 +74,6 @@ contract P2PPartialEscrow {
         uint256 minTrade,
         uint256 maxTrade
     );
-
     event ListingCancelled(uint256 indexed listingId);
 
     event OrderCreated(
@@ -83,15 +83,39 @@ contract P2PPartialEscrow {
         uint256 amount,
         uint256 price
     );
-
     event OrderPaid(uint256 indexed orderId);
-    event OrderReleased(uint256 indexed orderId);
-    event OrderCancelled(uint256 indexed orderId);
+    event OrderReleased(uint256 indexed orderId, address releasedTo);
+    event OrderCancelled(uint256 indexed orderId, string reason);
     event OrderDisputed(uint256 indexed orderId);
+    event OrderDisputeResolved(uint256 indexed orderId, address winner, uint256 amount);
 
-    constructor(address tokenAddress) {
+    event AdminUpdated(address indexed oldAdmin, address indexed newAdmin);
+    event TimeoutUpdated(uint256 oldTimeout, uint256 newTimeout);
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "only admin");
+        _;
+    }
+
+    constructor(address tokenAddress, address adminAddress) {
         require(tokenAddress != address(0), "token required");
+        require(adminAddress != address(0), "admin required");
         token = IERC20(tokenAddress);
+        admin = adminAddress;
+    }
+
+    function setAdmin(address newAdmin) external onlyAdmin {
+        require(newAdmin != address(0), "admin required");
+        address old = admin;
+        admin = newAdmin;
+        emit AdminUpdated(old, newAdmin);
+    }
+
+    function setOrderTimeout(uint256 newTimeoutSeconds) external onlyAdmin {
+        require(newTimeoutSeconds >= 5 minutes, "timeout too low");
+        uint256 old = orderTimeoutSeconds;
+        orderTimeoutSeconds = newTimeoutSeconds;
+        emit TimeoutUpdated(old, newTimeoutSeconds);
     }
 
     function createListing(
@@ -122,7 +146,6 @@ contract P2PPartialEscrow {
             status: ListingStatus.ACTIVE
         });
 
-        // SELL listing escrows tokens at creation
         if (ListingType(listingType) == ListingType.SELL) {
             require(token.transferFrom(msg.sender, address(this), totalAmount), "escrow fail");
         }
@@ -171,11 +194,12 @@ contract P2PPartialEscrow {
             taker: msg.sender,
             amount: amount,
             price: l.price,
-            status: OrderStatus.CREATED
+            status: OrderStatus.CREATED,
+            createdAt: block.timestamp,
+            paidAt: 0
         });
 
-        // BUY listing escrows taker tokens at order creation.
-        // For SELL listing, maker tokens were escrowed on listing creation.
+        // BUY listing escrows taker tokens when order is opened.
         if (l.listingType == ListingType.BUY) {
             require(token.transferFrom(msg.sender, address(this), amount), "buyer escrow fail");
         }
@@ -189,8 +213,6 @@ contract P2PPartialEscrow {
         require(o.status == OrderStatus.CREATED, "invalid status");
 
         Listing storage l = listings[o.listingId];
-        // SELL listing: taker has paid maker in fiat.
-        // BUY listing: maker has paid taker in fiat.
         if (l.listingType == ListingType.SELL) {
             require(msg.sender == o.taker, "only taker for SELL");
         } else {
@@ -198,6 +220,7 @@ contract P2PPartialEscrow {
         }
 
         o.status = OrderStatus.PAID;
+        o.paidAt = block.timestamp;
         emit OrderPaid(orderId);
     }
 
@@ -207,19 +230,19 @@ contract P2PPartialEscrow {
         require(o.status == OrderStatus.PAID, "not paid");
 
         Listing storage l = listings[o.listingId];
+        address releaseTo;
 
-        // SELL listing: maker releases escrowed maker tokens to taker.
-        // BUY listing: taker releases escrowed taker tokens to maker.
         if (l.listingType == ListingType.SELL) {
             require(msg.sender == o.maker, "only maker for SELL");
-            require(token.transfer(o.taker, o.amount), "release fail");
+            releaseTo = o.taker;
         } else {
             require(msg.sender == o.taker, "only taker for BUY");
-            require(token.transfer(o.maker, o.amount), "release fail");
+            releaseTo = o.maker;
         }
 
         o.status = OrderStatus.RELEASED;
-        emit OrderReleased(orderId);
+        require(token.transfer(releaseTo, o.amount), "release fail");
+        emit OrderReleased(orderId, releaseTo);
     }
 
     function cancelOrder(uint256 orderId) external {
@@ -228,25 +251,16 @@ contract P2PPartialEscrow {
         require(o.status == OrderStatus.CREATED || o.status == OrderStatus.PAID, "not cancelable");
         require(msg.sender == o.maker || msg.sender == o.taker, "not participant");
 
-        o.status = OrderStatus.CANCELLED;
+        _cancelOrderAndRefund(orderId, "manual_cancel");
+    }
 
-        // Return escrow to source side depending on listing type.
-        Listing storage l = listings[o.listingId];
-        if (l.listingType == ListingType.SELL) {
-            require(token.transfer(o.maker, o.amount), "maker refund fail");
-            l.remainingAmount += o.amount;
-            if (l.status == ListingStatus.CLOSED) {
-                l.status = ListingStatus.ACTIVE;
-            }
-        } else {
-            require(token.transfer(o.taker, o.amount), "taker refund fail");
-            l.remainingAmount += o.amount;
-            if (l.status == ListingStatus.CLOSED) {
-                l.status = ListingStatus.ACTIVE;
-            }
-        }
+    function autoCancelExpired(uint256 orderId) external {
+        Order storage o = orders[orderId];
+        require(o.id != 0, "order missing");
+        require(o.status == OrderStatus.CREATED, "status must be created");
+        require(block.timestamp > o.createdAt + orderTimeoutSeconds, "not expired");
 
-        emit OrderCancelled(orderId);
+        _cancelOrderAndRefund(orderId, "timeout");
     }
 
     function openDispute(uint256 orderId) external {
@@ -257,5 +271,37 @@ contract P2PPartialEscrow {
 
         o.status = OrderStatus.DISPUTED;
         emit OrderDisputed(orderId);
+    }
+
+    function resolveDispute(uint256 orderId, bool releaseToTaker) external onlyAdmin {
+        Order storage o = orders[orderId];
+        require(o.id != 0, "order missing");
+        require(o.status == OrderStatus.DISPUTED, "not disputed");
+
+        o.status = OrderStatus.RELEASED;
+
+        address winner = releaseToTaker ? o.taker : o.maker;
+        require(token.transfer(winner, o.amount), "dispute release fail");
+
+        emit OrderDisputeResolved(orderId, winner, o.amount);
+    }
+
+    function _cancelOrderAndRefund(uint256 orderId, string memory reason) internal {
+        Order storage o = orders[orderId];
+        o.status = OrderStatus.CANCELLED;
+
+        Listing storage l = listings[o.listingId];
+        l.remainingAmount += o.amount;
+        if (l.status == ListingStatus.CLOSED) {
+            l.status = ListingStatus.ACTIVE;
+        }
+
+        if (l.listingType == ListingType.SELL) {
+            require(token.transfer(o.maker, o.amount), "maker refund fail");
+        } else {
+            require(token.transfer(o.taker, o.amount), "taker refund fail");
+        }
+
+        emit OrderCancelled(orderId, reason);
     }
 }

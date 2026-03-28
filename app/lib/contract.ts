@@ -73,6 +73,18 @@ export const release = async (orderId: number) => {
   await sendContractTx(contractAddress, "release", [orderId]);
 };
 
+export const cancelOrder = async (orderId: number) => {
+  await sendContractTx(contractAddress, "cancelOrder", [orderId]);
+};
+
+export const autoCancelExpired = async (orderId: number) => {
+  await sendContractTx(contractAddress, "autoCancelExpired", [orderId]);
+};
+
+export const openDispute = async (orderId: number) => {
+  await sendContractTx(contractAddress, "openDispute", [orderId]);
+};
+
 export const getListingCount = async () => {
   if (!(window as any).ethereum) {
     return 0;
