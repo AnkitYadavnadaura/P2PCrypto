@@ -765,9 +765,9 @@ const TradeModal = ({ ad, marketTab, onClose }: any) => {
     }
 
     if (marketTab === "buy") {
-      joinSellAd(listingId);
+      joinSellAd(listingId, amount || "1");
     } else {
-      joinBuyAd(listingId, "1"); // temp amount
+      joinBuyAd(listingId, amount || "1");
     }
   }}
   className={`w-full bg-green-500 text-black py-3 rounded-xl`}

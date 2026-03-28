@@ -29,38 +29,48 @@ const sendContractTx = async (
    CREATE LISTING
 ========================= */
 
-export const createSellListing = async (amount: string) => {
+export const createSellListing = async (
+  amount: string,
+  price: string = "1",
+  minTrade: string = "1",
+  maxTrade: string = amount,
+) => {
   await sendContractTx(tokenAddress, "approve", [contractAddress, amount]);
-  await sendContractTx(contractAddress, "createListing", [amount, 1]);
+  await sendContractTx(contractAddress, "createListing", [amount, price, 1, minTrade, maxTrade]);
 };
 
-export const createBuyListing = async (amount: string) => {
-  await sendContractTx(contractAddress, "createListing", [amount, 0]);
+export const createBuyListing = async (
+  amount: string,
+  price: string = "1",
+  minTrade: string = "1",
+  maxTrade: string = amount,
+) => {
+  await sendContractTx(contractAddress, "createListing", [amount, price, 0, minTrade, maxTrade]);
 };
 
 /* =========================
-   JOIN
+   JOIN (PARTIAL FILL)
 ========================= */
 
-export const joinSellAd = async (listingId: number) => {
-  await sendContractTx(contractAddress, "joinListing", [listingId]);
+export const joinSellAd = async (listingId: number, amount: string) => {
+  await sendContractTx(contractAddress, "joinListing", [listingId, amount]);
 };
 
 export const joinBuyAd = async (listingId: number, amount: string) => {
   await sendContractTx(tokenAddress, "approve", [contractAddress, amount]);
-  await sendContractTx(contractAddress, "joinListing", [listingId]);
+  await sendContractTx(contractAddress, "joinListing", [listingId, amount]);
 };
 
 /* =========================
    TRADE ACTIONS
 ========================= */
 
-export const markPaid = async (listingId: number) => {
-  await sendContractTx(contractAddress, "markPaid", [listingId]);
+export const markPaid = async (orderId: number) => {
+  await sendContractTx(contractAddress, "markPaid", [orderId]);
 };
 
-export const release = async (listingId: number) => {
-  await sendContractTx(contractAddress, "release", [listingId]);
+export const release = async (orderId: number) => {
+  await sendContractTx(contractAddress, "release", [orderId]);
 };
 
 export const getListingCount = async () => {
