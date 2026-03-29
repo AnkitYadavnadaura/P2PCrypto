@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const connectionString = process.env.DATABASE_URL || process.env.data_url || '';
+const pool = connectionString ? new Pool({ connectionString }) : null;
 let initialized = false;
 
 async function ensureTables() {
