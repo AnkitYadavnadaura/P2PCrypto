@@ -4,8 +4,8 @@ import Pusher from 'pusher';
 import { requireWalletAuth } from '../../lib/auth';
 import { checkDurableRateLimit } from '../../lib/durable-guard';
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
+const connectionString = process.env.DATABASE_URL || process.env.data_url || '';
+const pool = connectionString ? new Pool({ connectionString }) : null;
 const pusher = new Pusher({
   appId: process.env.PUSHER_APP_ID || '',
   key: process.env.PUSHER_KEY || '',
