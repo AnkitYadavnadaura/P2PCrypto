@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../../../lib/prisma";
 import { requireWalletAuth } from "../../lib/auth";
-import { checkRateLimit } from "../../lib/rate-limit";
-import { getIdempotencyResponse, setIdempotencyResponse } from "../../lib/idempotency";
+import {
+  checkDurableRateLimit,
+  getDurableIdempotency,
+  setDurableIdempotency,
+} from "../../lib/durable-guard";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,12 +28,12 @@ export async function POST(req: NextRequest) {
     const auth = await requireWalletAuth(walletAddress);
     if (!auth.ok) return auth.response;
 
-    const rl = checkRateLimit(`listing:post:${auth.wallet}`, 30, 60_000);
+    const rl = await checkDurableRateLimit("listing:post", auth.wallet, 30, 60);
     if (!rl.ok) return rl.response;
 
     const idemKey = (req.headers.get("x-idempotency-key") || "").trim();
     if (idemKey) {
-      const cached = getIdempotencyResponse(`listing:post:${auth.wallet}:${idemKey}`);
+      const cached = await getDurableIdempotency(`listing:post:${auth.wallet}`, idemKey);
       if (cached) return cached;
     }
 
@@ -117,7 +120,7 @@ export async function POST(req: NextRequest) {
 
     const payload = { listing };
     if (idemKey) {
-      setIdempotencyResponse(`listing:post:${auth.wallet}:${idemKey}`, payload, { status: 201 });
+      await setDurableIdempotency(`listing:post:${auth.wallet}`, idemKey, payload, 201, 120)
     }
 
     return NextResponse.json(payload, { status: 201 });

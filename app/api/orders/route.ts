@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import { requireWalletAuth } from '../../lib/auth';
 import { ORDER_STATUS, OrderStatus, canTransitionStatus } from '../../lib/order-state';
-import { checkRateLimit } from '../../lib/rate-limit';
-import { getIdempotencyResponse, setIdempotencyResponse } from '../../lib/idempotency';
+import {
+  checkDurableRateLimit,
+  getDurableIdempotency,
+  setDurableIdempotency,
+} from '../../lib/durable-guard';
 
 export async function GET() {
   const rows = await prisma.order.findMany({
@@ -29,12 +32,12 @@ export async function POST(req: NextRequest) {
   const auth = await requireWalletAuth(walletAddress);
   if (!auth.ok) return auth.response;
 
-  const rl = checkRateLimit(`orders:post:${auth.wallet}`, 20, 60_000);
+  const rl = await checkDurableRateLimit('orders:post', auth.wallet, 20, 60);
   if (!rl.ok) return rl.response;
 
-  const idemKey = req.headers.get('x-idempotency-key');
+  const idemKey = (req.headers.get('x-idempotency-key') || "").trim();
   if (idemKey) {
-    const cached = getIdempotencyResponse(`orders:post:${auth.wallet}:${idemKey}`);
+    const cached = await getDurableIdempotency('orders:post:' + auth.wallet, idemKey);
     if (cached) return cached;
   }
 
@@ -98,7 +101,7 @@ export async function POST(req: NextRequest) {
 
   const payload = order;
   if (idemKey) {
-    setIdempotencyResponse(`orders:post:${auth.wallet}:${idemKey}`, payload, { status: 201 });
+    await setDurableIdempotency(`orders:post:${auth.wallet}`, idemKey, payload, 201, 120)
   }
 
   return NextResponse.json(payload, { status: 201 });
@@ -111,7 +114,7 @@ export async function PATCH(req: NextRequest) {
   const auth = await requireWalletAuth(walletAddress);
   if (!auth.ok) return auth.response;
 
-  const rl = checkRateLimit(`orders:patch:${auth.wallet}`, 40, 60_000);
+  const rl = await checkDurableRateLimit('orders:patch', auth.wallet, 40, 60);
   if (!rl.ok) return rl.response;
 
   if (!orderId || !nextStatus) {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ethers } from 'ethers';
 import { prisma } from '../../../lib/prisma';
 import { ABI } from '../../lib/abi';
+import { getCheckpoint, setCheckpoint } from '../../lib/durable-guard';
 
 const CONTRACT_ADDRESS = process.env.P2P_CONTRACT_ADDRESS || '';
 const RPC_URL = process.env.WORLDCHAIN_RPC_URL || '';
@@ -26,11 +27,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'RPC or contract env missing' }, { status: 500 });
     }
 
-    const { fromBlock, toBlock } = await req.json();
+    const { fromBlock, toBlock, checkpointName } = await req.json();
     const provider = new ethers.JsonRpcProvider(RPC_URL);
     const latestBlock = await provider.getBlockNumber();
 
-    const from = Number(fromBlock ?? latestBlock - 1_000);
+    const cpName = checkpointName || 'p2p-reconcile';
+    const checkpoint = await getCheckpoint(cpName);
+    const from = Number(fromBlock ?? checkpoint ?? Math.max(0, latestBlock - 1_000));
     const to = Number(toBlock ?? latestBlock);
 
     if (!Number.isFinite(from) || !Number.isFinite(to) || from < 0 || to < from) {
@@ -131,9 +134,12 @@ export async function POST(req: Request) {
       }
     }
 
+    await setCheckpoint(cpName, to);
+
     return NextResponse.json({
       ok: true,
       range: { from, to },
+      checkpoint: cpName,
       counts: {
         created: createdLogs.length,
         paid: paidLogs.length,
