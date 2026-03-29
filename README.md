@@ -17,3 +17,7 @@ Quick start:
 Notes:
 - This is a template scaffold — secure key management, production-ready DB pooling, KMS signing, and KYC are not included and must be added before going live.
 - Use a serverless-friendly Postgres provider (Neon, Vercel Postgres, etc.).
+
+
+Deployment:
+- See `docs/DEPLOYMENT.md` for production rollout, health checks, and reconciliation scheduling.

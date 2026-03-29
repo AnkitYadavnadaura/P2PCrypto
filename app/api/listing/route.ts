@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient, Prisma } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { Prisma } from "@prisma/client";
+import { prisma } from "../../../lib/prisma";
+import { requireWalletAuth } from "../../lib/auth";
+import {
+  checkDurableRateLimit,
+  getDurableIdempotency,
+  setDurableIdempotency,
+} from "../../lib/durable-guard";
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +24,18 @@ export async function POST(req: NextRequest) {
       paymentMethods,
       maxTimeMinutes,
     } = body;
+
+    const auth = await requireWalletAuth(walletAddress);
+    if (!auth.ok) return auth.response;
+
+    const rl = await checkDurableRateLimit("listing:post", auth.wallet, 30, 60);
+    if (!rl.ok) return rl.response;
+
+    const idemKey = (req.headers.get("x-idempotency-key") || "").trim();
+    if (idemKey) {
+      const cached = await getDurableIdempotency(`listing:post:${auth.wallet}`, idemKey);
+      if (cached) return cached;
+    }
 
     /* =========================
        BASIC VALIDATION
@@ -75,6 +92,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (type === "SELL" && Number(balance) < Number(maxAmount)) {
+      return NextResponse.json(
+        { error: "SELL listing requires escrow-ready balance >= maxAmount" },
+        { status: 400 }
+      );
+    }
+
     /* =========================
        CREATE LISTING
        ========================= */
@@ -94,12 +118,20 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({ listing }, { status: 201 });
+    const payload = { listing };
+    if (idemKey) {
+      await setDurableIdempotency(`listing:post:${auth.wallet}`, idemKey, payload, 201, 120)
+    }
 
-  } catch (err) {
+    return NextResponse.json(payload, { status: 201 });
+
+  } catch (err: any) {
     console.error("CREATE LISTING ERROR:", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      {
+        error: "Internal server error",
+        detail: process.env.NODE_ENV !== "production" ? String(err?.message || err) : undefined,
+      },
       { status: 500 }
     );
   }
@@ -119,7 +151,7 @@ export async function GET(request: Request) {
           createdAt: "desc",
         },
       });
-    } 
+    }
     // 🔹 CASE 2: ALL PUBLIC ADS (marketplace)
     else {
       listings = await prisma.listing.findMany({
